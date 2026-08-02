@@ -105,7 +105,7 @@ cd scripts
 python 01_scrape_mass.py
 python 02_wayback_aperturas.py
 python 03_descargar_osm.py
-# ... hasta 09_poblacion.py
+# ... hasta 10_generar_json_app.py
 ```
 
 **Levantar la aplicación de exploración:**
