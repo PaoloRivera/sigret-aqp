@@ -3,7 +3,7 @@
 **Sistema de soporte a la decisión basado en analítica geoespacial y aprendizaje automático para la localización de minimarkets independientes en Arequipa Metropolitana**
 
 Tesis de Ingeniería de Sistemas · Universidad Católica de Santa María · 2026
-Autor: Paolo Marcelo Rivera Salas
+Autores: Fernando Gabriel Casapia Loayza, Paolo Marcelo Rivera Salas
 
 ---
 
@@ -166,4 +166,4 @@ Los datos de OpenStreetMap incluidos en `data/osm/` están sujetos a la **Open D
 
 ## Cómo citar
 
-> Rivera Salas, P. M. (2026). *Sistema de soporte a la decisión basado en analítica geoespacial y aprendizaje automático para la localización de minimarkets independientes en Arequipa Metropolitana* [Tesis de pregrado, Universidad Católica de Santa María].
+> Casapia Loayza, F. G., & Rivera Salas, P. M. (2026). *Sistema de soporte a la decisión basado en analítica geoespacial y aprendizaje automático para la localización de minimarkets independientes en Arequipa Metropolitana* [Tesis de pregrado, Universidad Católica de Santa María].
