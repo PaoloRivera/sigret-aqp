@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: >-
+  SIGRET-AQP: Sistema de soporte a la decision basado en analitica
+  geoespacial y aprendizaje automatico para la localizacion de
+  minimarkets independientes en Arequipa Metropolitana
+message: Si utiliza este trabajo, por favor citelo como se indica.
+type: software
+authors:
+  - given-names: Paolo Marcelo
+    family-names: Rivera Salas
+    affiliation: Universidad Catolica de Santa Maria
+year: 2026
+license: MIT
+keywords:
+  - decision support system
+  - geospatial analytics
+  - machine learning
+  - H3 hexagonal indexing
+  - Huff model
+  - revealed preference
+  - retail site selection
+  - Peru

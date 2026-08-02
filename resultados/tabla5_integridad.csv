@@ -1,0 +1,9 @@
+﻿Verificacion,Condicion de cumplimiento,Valor observado,Se cumple
+Conservacion de la poblacion en la ponderacion areal,Diferencia entre poblacion censal y poblacion repartida < 0.5 %,"1,018,031 vs 1,018,031 (0.000 %)",Si
+Cobertura de manzanas por la malla,Ninguna manzana censal queda fuera de la malla H3,0 manzanas sin celda asignada,Si
+Composicion de la malla,Nucleo censado + anillo de expansion = total de celdas,"2,597 nucleo + 1,120 anillo = 3,717",Si
+Normalizacion de codigos del panel historico,El conteo de tiendas unicas no varia tras normalizar capitalizacion,127 sin normalizar vs 127 normalizado,Si
+Integridad numerica de la matriz de caracteristicas,La matriz no contiene valores infinitos ni nulos,"0 infinitos, 0 nulos",Si
+Exclusion de variables con fuga de informacion,Ningun predictor deriva de la red de retail moderno,"37 predictores, 0 variables de fuga",Si
+Independencia de las particiones espaciales,Ningun bloque H3 r6 aparece en entrenamiento y prueba simultaneamente,"52 bloques, 0 compartidos",Si
+Comparacion contra lineas base univariadas,El backtesting evalua los 4 modelos y las 3 lineas base,7 modelos evaluados,Si

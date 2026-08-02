@@ -1,0 +1,49 @@
+# ── Python ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# ── Entorno y credenciales ──────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# ── Dependencias ────────────────────────────────────────────────────
+node_modules/
+vendor/
+.pnpm-store/
+
+# ── Datos pesados no versionados ────────────────────────────────────
+# Padron completo de SUNAT (~1.6 GB). Ver data/README.md para descargarlo.
+data_sunat/
+data/sunat/sunat_universo_arequipa.csv
+data/sunat/padron_reducido_ruc*.txt
+
+# Salidas intermedias regenerables
+out/
+paquete/
+raw/
+cache/
+tesis_data.zip
+
+# ── Laravel ─────────────────────────────────────────────────────────
+app_web/storage/framework/
+app_web/storage/logs/
+app_web/public/build/
+app_web/public/hot
+
+# ── Sistema operativo ───────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Documentos de trabajo ───────────────────────────────────────────
+~$*
+*.tmp
+TESIS/
