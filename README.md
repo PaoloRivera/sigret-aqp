@@ -59,6 +59,7 @@ La exclusión de esas variables está verificada automáticamente por `verificar
 ├── sensibilidad_ranking.py  Análisis de sensibilidad del score (Tabla 15, Figura 25)
 ├── figuras_capitulo5.py     Figuras 20 a 24 y 26 a 28 del Capítulo V
 ├── calcular_ahp.py          Agregación del panel de expertos (Tablas 13 y 14)
+├── analisis_complementarios.py  Robustez: bootstrap, Moran, VIF, AOA, fuga temporal
 ├── requirements.txt         Versiones exactas de las dependencias de Python
 │
 ├── scripts/                 Adquisición de datos (ejecución única) y exportación a la web
@@ -101,6 +102,7 @@ python pipeline.py                     # malla, características, modelos y rank
 python verificar_integridad.py         # Tabla 6
 python sensibilidad_ranking.py         # Tabla 15 y Figura 25
 python figuras_capitulo5.py            # Figuras 20–24 y 26–28
+python analisis_complementarios.py     # IC bootstrap, Moran, VIF, área de aplicabilidad, fuga OSM
 python scripts/10_generar_json_app.py  # datos de la aplicación web
 ```
 

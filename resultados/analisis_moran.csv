@@ -1,0 +1,4 @@
+variable,I_Moran,p_valor
+Variable objetivo (tienda en 2026),0.05927844532099076,0.001
+Residuos fuera de muestra de Random Forest,0.05121817432031702,0.001
+Poblacion de la celda,0.7924561241509208,0.001
