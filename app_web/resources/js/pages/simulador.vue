@@ -1,7 +1,7 @@
 <script setup>
 import { useTheme } from 'vuetify'
 import HexMap from '@/views/sigret/HexMap.vue'
-import { huff as estimarHuff, useSigret } from '@/stores/sigret'
+import { UMBRAL_ENTRADA_CADENA, huff as estimarHuff, useSigret } from '@/stores/sigret'
 
 const store = useSigret()
 const theme = useTheme()
@@ -126,6 +126,14 @@ const alertas = computed(() => {
     a.push({
       t: 'warning',
       txt: `${h.value.n_comp_osm_k1} competidores registrados en el área de captación.`,
+    })
+  }
+  if (h.value.p_potencial >= UMBRAL_ENTRADA_CADENA) {
+    a.push({
+      t: 'warning',
+      txt: 'Alta probabilidad de entrada de la cadena: la celda tiene el perfil '
+        + 'donde la cadena suele abrir. Considerar que puede llegar un competidor '
+        + 'de descuento en el horizonte de recuperación.',
     })
   }
   a.push({

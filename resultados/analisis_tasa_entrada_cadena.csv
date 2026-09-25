@@ -1,0 +1,5 @@
+conjunto,n,celdas_con_apertura_a_menos_de_750m,tasa_entrada,apertura_en_la_propia_celda
+Top-10 con el estado de 2024,10,10,1.0,2
+Top-20 con el estado de 2024,20,16,0.8,3
+Top-50 con el estado de 2024,50,38,0.76,6
+Todas las celdas viables en 2024,1259,445,0.3534551231135822,39

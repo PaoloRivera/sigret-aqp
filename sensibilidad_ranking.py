@@ -36,9 +36,9 @@ base_top10 = set(F.assign(S=calcular_score()).nlargest(10, "S")["h3"])
 variaciones = np.arange(-0.20, 0.21, 0.05)
 parametros = {
     "Peso del perfil de sitio": lambda v: calcular_score(w_pot=W_POT * (1 + v)),
-    "Penalizacion hard discount": lambda v: calcular_score(pen_mass=PEN_MASS * (1 + v)),
+    "Penalización hard discount": lambda v: calcular_score(pen_mass=PEN_MASS * (1 + v)),
     "Radio de amenaza": lambda v: calcular_score(radio=RADIO * (1 + v)),
-    "Umbral de poblacion": lambda v: calcular_score(pob_min=POB_MIN * (1 + v)),
+    "Umbral de población": lambda v: calcular_score(pob_min=POB_MIN * (1 + v)),
 }
 
 filas = []
@@ -60,11 +60,11 @@ for (nombre, g), m in zip(T.groupby("parametro", sort=False), marcadores):
             marker=m, linewidth=2, markersize=6, label=nombre)
 
 ax.axhline(UMBRAL * 100, color="crimson", linestyle="--", linewidth=1.5,
-           label=f"Criterio de aceptacion ({UMBRAL:.0%})")
+           label=f"Criterio de aceptación ({UMBRAL:.0%})")
 ax.axvline(0, color="grey", linewidth=0.8, alpha=0.5)
-ax.set_xlabel("Variacion del parametro (%)")
+ax.set_xlabel("Variación del parámetro (%)")
 ax.set_ylabel("Permanencia del Top-10 (%)")
-ax.set_title("Sensibilidad del ranking ante variacion de los pesos del score")
+ax.set_title("Sensibilidad del ranking ante variación de los parámetros del score")
 ax.set_ylim(0, 105)
 ax.set_xticks(range(-20, 21, 5))
 ax.grid(alpha=0.25)

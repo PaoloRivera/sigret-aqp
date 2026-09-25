@@ -173,12 +173,37 @@ GRUPOS_POI = {
 }
 
 
-def features(grid, mass):
-    print("[3] Ingenieria de features")
-    poi = gpd.read_parquet(f"{DATA}/osm/poi_flujo.parquet")
-    comp = gpd.read_parquet(f"{DATA}/osm/competencia.parquet")
-    edges = gpd.read_parquet(f"{DATA}/osm/red_edges.parquet")
-    nodes = gpd.read_parquet(f"{DATA}/osm/red_nodes.parquet")
+# La capa de competencia de OpenStreetMap incluye locales de la propia cadena
+# (y de otras cadenas de conveniencia). Como la presencia de la cadena es la
+# variable objetivo, se excluyen por nombre y por cercania a una tienda de la
+# cadena ya abierta al corte de los datos, para evitar fuga de informacion.
+CADENAS = r"\bMASS\b|TAMBO|OXXO|LISTO|REPSHOP"
+RADIO_CADENA_M = 50
+
+
+def filtrar_cadenas(comp, mass, corte):
+    txt = comp[[c for c in ("name", "brand", "operator") if c in comp.columns]] \
+        .astype(str).agg(" ".join, axis=1).str.upper()
+    por_nombre = txt.str.contains(CADENAS, regex=True).values
+    abiertas = mass.drop_duplicates("codigo")
+    abiertas = abiertas[abiertas["anio_apertura"] <= corte]
+    mp = gpd.GeoDataFrame(abiertas, geometry=[Point(r.lng, r.lat) for r in abiertas.itertuples()],
+                          crs="EPSG:4326").to_crs(UTM)
+    cu = comp.to_crs(UTM)
+    d, _ = cKDTree(np.c_[mp.geometry.x, mp.geometry.y]).query(np.c_[cu.geometry.x, cu.geometry.y], k=1)
+    excluir = por_nombre | (d < RADIO_CADENA_M)
+    print(f"    competencia OSM ({corte}): {len(comp)} | excluidos por cadena: "
+          f"{excluir.sum()} (nombre {por_nombre.sum()}, < {RADIO_CADENA_M} m {(d < RADIO_CADENA_M).sum()})")
+    return comp[~excluir].copy()
+
+
+def features(grid, mass, osm=f"{DATA}/osm", corte=2026, archivo="features.parquet"):
+    print(f"[3] Ingenieria de features (capas OSM: {osm})")
+    poi = gpd.read_parquet(f"{osm}/poi_flujo.parquet")
+    comp = filtrar_cadenas(gpd.read_parquet(f"{osm}/competencia.parquet"), mass, corte)
+    comp.to_parquet(f"{OUT}/competencia_{corte}.parquet")
+    edges = gpd.read_parquet(f"{osm}/red_edges.parquet")
+    nodes = gpd.read_parquet(f"{osm}/red_nodes.parquet")
 
     F = grid[["h3", "DIST", "pob_2017", "area_km2", "dens_hab_km2",
               "es_nucleo", "n_mz"]].copy()
@@ -257,18 +282,21 @@ def features(grid, mass):
     F["pct_vial_princ"] = F["long_princ_m"] / (F["long_vial_m"] + 1)
 
     print(f"    matriz: {F.shape[0]:,} hexagonos x {F.shape[1]} columnas")
-    F.to_parquet(f"{OUT}/features.parquet")
+    F.to_parquet(f"{OUT}/{archivo}")
     return F
 
 
-def modelos(F):
+def modelos(F, F24):
+    """F: predictores con las capas OSM actuales (validacion cruzada y ranking).
+    F24: predictores con las capas OSM al 31-12-2024 (backtesting temporal)."""
     print("[4] Entrenamiento y validacion")
     PRED = [c for c in F.columns
             if c not in ("h3", "DIST", "es_nucleo")
             and not c.startswith(("mass_", "d_mass_"))]
     X = F[PRED].replace([np.inf, -np.inf], 0).fillna(0).values
+    X24 = F24.set_index("h3").loc[F["h3"], PRED].replace([np.inf, -np.inf], 0).fillna(0).values
 
-    def hacer_modelos(y):
+    def hacer_modelos(y, X=X):
         pw = (y == 0).sum() / max((y == 1).sum(), 1)
         sc = StandardScaler().fit(X)
         return {
@@ -304,13 +332,14 @@ def modelos(F):
         d["acierto@20"] = int(t[o[:20]].sum())
         return d
 
-    res = [evaluar(F["dens_hab_km2"].values, "Baseline densidad"),
-           evaluar(F["pob_k1"].values, "Baseline pob. k1"),
-           evaluar(F["n_poi_k1"].values, "Baseline POIs k1")]
-    M24 = hacer_modelos(y24)
+    b24 = F24.set_index("h3").loc[F["h3"]]
+    res = [evaluar(b24["dens_hab_km2"].values, "Baseline densidad"),
+           evaluar(b24["pob_k1"].values, "Baseline pob. k1"),
+           evaluar(b24["n_poi_k1"].values, "Baseline POIs k1")]
+    M24 = hacer_modelos(y24, X24)
     probs = {}
     for nom, (tipo, sc, m) in M24.items():
-        p = m.predict_proba(sc.transform(X) if tipo == "s" else X)[:, 1]
+        p = m.predict_proba(sc.transform(X24) if tipo == "s" else X24)[:, 1]
         probs[nom] = p
         res.append(evaluar(p, {"LR": "Regresion logistica", "RF": "Random Forest",
                                "XGB": "XGBoost"}[nom]))
@@ -392,8 +421,9 @@ if __name__ == "__main__":
     grid = construir_malla()
     mass = panel_mass()
     F = features(grid, mass)
-    F = modelos(F)
+    F24 = features(grid, mass, f"{DATA}/osm_2024", 2024, "features_2024.parquet")
+    F = modelos(F, F24)
     out = score(F, grid)
     print("\n=== PIPELINE COMPLETO ===")
     print(f"  en {OUT}/: grid.parquet · features.parquet · resultado_final.parquet")
-    print("  resultados_backtesting.csv · resultados_cv.csv · importancia_variables.csv")
+    print("  features_2024.parquet · resultados_backtesting.csv · resultados_cv.csv · importancia_variables.csv")

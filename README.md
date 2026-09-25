@@ -121,6 +121,7 @@ y `05_empaquetar.py` deja el resultado en `data/`. Desde la raíz del proyecto:
 python scripts/01_scrape_mass.py
 python scripts/02_wayback_aperturas.py
 python scripts/03_descargar_osm.py
+python scripts/03_descargar_osm.py --corte 2024-12-31   # capas históricas → data/osm_2024/
 python scripts/04_filtrar_sunat.py      # requiere el padrón de SUNAT en data_sunat/
 python scripts/06_descargar_manzanas.py
 python scripts/07_geocodificar.py

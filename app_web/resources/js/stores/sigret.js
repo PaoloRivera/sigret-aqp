@@ -17,6 +17,11 @@ const BASE = '/data'
 // informal se estima por densidad poblacional y se toma el máximo frente al
 // conteo observado, para no contar dos veces el mismo competidor.
 // Superficies asumidas: bodega tradicional 45 m², hard discount 175 m².
+// Celdas en el decil superior del perfil aprendido: en el backtesting, el 76 %
+// de las 50 mejor puntuadas con el estado de 2024 recibió una apertura de la
+// cadena a menos de 750 m en 2025-2026. Se advierte sin alterar el ranking.
+export const UMBRAL_ENTRADA_CADENA = 0.90
+
 export const M2_BODEGA = 45
 export const M2_MASS = 175
 export const ALPHA = 1.0

@@ -2,10 +2,10 @@
 """
 verificar_integridad.py
 
-Genera la Tabla 5 del Capitulo IV: corre las verificaciones de integridad del
+Genera la Tabla 6 del Capitulo IV: corre las verificaciones de integridad del
 pipeline (conservacion de la poblacion, cobertura de la malla, composicion de
 celdas, normalizacion de codigos, limpieza numerica, ausencia de fuga de
-informacion e independencia de las particiones espaciales) y las exporta a CSV.
+informacion, independencia de las particiones espaciales, exclusion de la\ncadena en la competencia OSM y corte temporal del backtesting) y las exporta a CSV.
 """
 import glob
 
@@ -111,7 +111,36 @@ try:
 except FileNotFoundError:
     pass
 
+# 9. La capa de competencia no contiene locales de la cadena (objetivo)
+from scipy.spatial import cKDTree
+CADENAS = r"\bMASS\b|TAMBO|OXXO|LISTO|REPSHOP"
+mpan = mp.drop_duplicates("codigo").to_crs(32719)
+coinc = []
+for corte in (2024, 2026):
+    cp = gpd.read_parquet(f"{OUT}/competencia_{corte}.parquet")
+    txt = cp[["name", "brand", "operator"]].astype(str).agg(" ".join, axis=1).str.upper()
+    abiertas = mpan[mpan["anio_apertura"] <= corte]
+    cu = cp.to_crs(32719)
+    d, _ = cKDTree(np.c_[abiertas.geometry.x, abiertas.geometry.y]).query(
+        np.c_[cu.geometry.x, cu.geometry.y], k=1)
+    coinc.append((corte, len(cp), int(txt.str.contains(CADENAS, regex=True).sum()), int((d < 50).sum())))
+n_coinc = sum(c[2] + c[3] for c in coinc)
+chk("Exclusion de locales de la cadena en la competencia OSM",
+    "Ningun competidor OSM coincide por nombre o a menos de 50 m con un local de la cadena",
+    "; ".join(f"{c[0]}: {c[1]} competidores, {c[2] + c[3]} coincidencias" for c in coinc),
+    n_coinc == 0)
+
+# 10. El backtesting usa predictores con datos al corte de entrenamiento
+with open(f"{DATA}/osm_2024/CORTE.txt") as f:
+    fecha = f.read().strip()
+F24 = pd.read_parquet(f"{OUT}/features_2024.parquet")
+c24 = gpd.read_parquet(f"{OUT}/competencia_2024.parquet")
+consistente = int(F24["n_comp_osm"].sum()) == len(c24)
+chk("Corte temporal de los predictores del backtesting",
+    "Los predictores del backtesting provienen de capas OSM con fecha <= 2024-12-31",
+    f"capas OSM al {fecha}; {len(c24)} competidores en la matriz de 2024", fecha <= "2024-12-31" and consistente)
+
 T = pd.DataFrame(filas)
-T.to_csv(f"{OUT}/tabla5_integridad.csv", index=False, encoding="utf-8-sig")
+T.to_csv(f"{OUT}/tabla6_integridad.csv", index=False, encoding="utf-8-sig")
 print(T.to_string(index=False))
-print("\n>> tabla5_integridad.csv generada")
+print("\n>> tabla6_integridad.csv generada")
