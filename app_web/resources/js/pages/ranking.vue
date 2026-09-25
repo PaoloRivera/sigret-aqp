@@ -28,14 +28,14 @@ const cabeceras = [
   { title: '#', key: 'pos', width: 52, sortable: false },
   { title: 'Distrito', key: 'dist' },
   { title: 'Pob. 500 m', key: 'pob_k1', align: 'end' },
-  { title: 'Compet.', key: 'n_comp_osm_k1', align: 'end' },
   { title: 'd Mass', key: 'd_mass_2026', align: 'end' },
-  { title: 'POIs', key: 'n_poi_k1', align: 'end' },
-  { title: 'Perfil ML', key: 'p_potencial', align: 'end' },
   { title: 'Captura/mes', key: 'captura', align: 'end' },
   { title: 'Payback', key: 'payback', align: 'end' },
-  { title: 'Score', key: 'score', align: 'end', width: 150 },
+  { title: 'Score', key: 'score', align: 'end', width: 120 },
 ]
+
+// Nombres de distrito en tipo título: "CERRO COLORADO" → "Cerro Colorado"
+const titulo = s => s.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase())
 
 const maxScore = computed(() => Math.max(...filas.value.map(f => f.score), 0.001))
 
@@ -133,7 +133,7 @@ function color(h) {
             :items="filas"
             :items-per-page="cuantos"
             item-value="h3"
-            density="comfortable"
+            density="compact"
             hover
             class="tabla-ranking"
             hide-default-footer
@@ -145,7 +145,7 @@ function color(h) {
             <template #item.dist="{ item }">
               <div class="d-flex align-center gap-2">
                 <VIcon icon="bx-map-pin" size="15" :color="color(item)" />
-                <span class="font-weight-medium">{{ item.dist }}</span>
+                <span class="font-weight-medium text-no-wrap">{{ titulo(item.dist) }}</span>
               </div>
             </template>
 

@@ -22,6 +22,7 @@ import os
 import sys
 
 import glob
+from datetime import date
 
 import geopandas as gpd
 import pandas as pd
@@ -63,9 +64,9 @@ FUENTES = [
     {"n": "OpenStreetMap", "t": "Red vial caminable",
      "v": "Nodos y aristas", "l": "ODbL · © colaboradores de OpenStreetMap"},
     {"n": "Localizador público de la cadena", "t": "Red de retail moderno",
-     "v": "136 tiendas nacionales", "l": "Sitio web público"},
+     "v": "127 tiendas con coordenadas", "l": "Sitio web público"},
     {"n": "Internet Archive", "t": "Versiones archivadas del localizador",
-     "v": "4 snapshots anuales · 2023-2026", "l": "Público"},
+     "v": "4 snapshots · 2024-2026", "l": "Público"},
 ]
 
 
@@ -176,7 +177,7 @@ poblacion_distrito = [{"d": k, "p": int(round(v))} for k, v in pobd.items()]
 F = pd.read_parquet(f"{RES}/features.parquet", columns=["mass_2026"])
 tasa_base_cv = round(float((F["mass_2026"] > 0).mean()), 4)
 
-json.dump({"backtesting": backtesting, "cv_espacial": cv, "tasa_base_cv": tasa_base_cv,
+json.dump({"generado": date.today().isoformat(), "backtesting": backtesting, "cv_espacial": cv, "tasa_base_cv": tasa_base_cv,
            "importancias": importancias, "aperturas": aperturas,
            "poblacion_distrito": poblacion_distrito, "fuentes": FUENTES},
           open(f"{DESTINO}/meta.json", "w", encoding="utf-8"),

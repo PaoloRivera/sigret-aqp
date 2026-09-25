@@ -35,14 +35,14 @@ const distSerie = computed(() => [{
 const distOpts = computed(() => ({
   chart: { type: 'bar', toolbar: { show: false }, parentHeightOffset: 0 },
   plotOptions: {
-    bar: { horizontal: true, borderRadius: 4, barHeight: '62%', distributed: true },
+    bar: { horizontal: true, borderRadius: 4, barHeight: '62%', distributed: true, dataLabels: { position: 'top' } },
   },
   colors: store.topPorDistrito.map((_, i) =>
     scoreScale[Math.max(0, scoreScale.length - 1 - Math.floor(i * 0.7))]),
   dataLabels: {
     enabled: true,
     style: { fontSize: '11px', fontWeight: 600, colors: [txt.value] },
-    offsetX: 20,
+    offsetX: 18,
   },
   legend: { show: false },
   grid: { borderColor: borde.value, xaxis: { lines: { show: true } }, padding: { left: 0 } },
@@ -91,7 +91,7 @@ const dispOpts = computed(() => ({
     tickAmount: 5,
   },
   yaxis: {
-    title: { text: 'Celdas con presencia Mass', style: { color: txtSuave.value, fontSize: '11px', fontWeight: 500 } },
+    title: { text: 'Tiendas Mass en el distrito', style: { color: txtSuave.value, fontSize: '11px', fontWeight: 500 } },
     labels: { style: { colors: txtSuave.value, fontSize: '11px' } },
   },
   tooltip: {

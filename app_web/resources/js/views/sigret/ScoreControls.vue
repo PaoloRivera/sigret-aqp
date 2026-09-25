@@ -17,7 +17,7 @@ const capas = defineModel('capas', {
   <VCard>
     <VCardItem class="pb-2">
       <VCardTitle class="text-body-1 font-weight-bold">
-        Parámetros del modelo
+        Parámetros
       </VCardTitle>
       <template #append>
         <VBtn
