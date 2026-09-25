@@ -11,9 +11,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-W_POT = 0.45
-PEN_MASS = 0.60
-RADIO = 800
+# Parametros elicitados por el panel de expertos (AHP)
+W_POT = 0.344
+PEN_MASS = 0.261
+RADIO = 750
 POB_MIN = 1500
 UMBRAL = 0.70
 
