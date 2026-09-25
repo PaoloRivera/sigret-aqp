@@ -27,6 +27,7 @@ from sklearn.preprocessing import StandardScaler
 
 np.random.seed(42)
 DATA = "data"
+OUT = "resultados"
 UTM = 32719
 RES = 9
 
@@ -102,7 +103,7 @@ def construir_malla():
     grid["dens_hab_km2"] = grid["pob_2017"] / grid["area_km2"]
 
     print(f"    hexagonos: {len(grid):,} | poblacion repartida: {grid['pob_2017'].sum():,.0f}")
-    grid.to_parquet("grid.parquet")
+    grid.to_parquet(f"{OUT}/grid.parquet")
     return grid
 
 
@@ -152,7 +153,7 @@ def panel_mass():
     H["h3"] = [h3.latlng_to_cell(r.lat, r.lng, RES) for r in H.itertuples()]
     H = H.merge(H.groupby("codigo")["anio"].min().rename("anio_apertura"), on="codigo")
     gpd.GeoDataFrame(H, geometry=[Point(r.lng, r.lat) for r in H.itertuples()],
-                     crs="EPSG:4326").to_parquet("mass_panel.parquet")
+                     crs="EPSG:4326").to_parquet(f"{OUT}/mass_panel.parquet")
     u = H.sort_values("anio").drop_duplicates("codigo", keep="last")
     print(f"    tiendas unicas: {H['codigo'].nunique()} | hexagonos: {H['h3'].nunique()}")
     print(f"    aperturas por anio:\n{u['anio_apertura'].value_counts().sort_index().to_string()}")
@@ -256,7 +257,7 @@ def features(grid, mass):
     F["pct_vial_princ"] = F["long_princ_m"] / (F["long_vial_m"] + 1)
 
     print(f"    matriz: {F.shape[0]:,} hexagonos x {F.shape[1]} columnas")
-    F.to_parquet("features.parquet")
+    F.to_parquet(f"{OUT}/features.parquet")
     return F
 
 
@@ -319,7 +320,7 @@ def modelos(F):
     print("\n    --- Backtesting temporal ---")
     print(R[["modelo", "PR_AUC", "ROC_AUC", "P@20", "Lift@10%", "acierto@20"]]
           .round(3).to_string(index=False))
-    R.to_csv("resultados_backtesting.csv", index=False)
+    R.to_csv(f"{OUT}/resultados_backtesting.csv", index=False)
 
     y = F["mass_2026"].values
     F["bloque"] = [h3.cell_to_parent(c, 6) for c in F["h3"]]
@@ -340,18 +341,20 @@ def modelos(F):
             .fit(X[tr], y[tr]).predict_proba(X[te])[:, 1]
 
     print(f"\n    --- Validacion cruzada espacial ({F['bloque'].nunique()} bloques H3 r6) ---")
+    oof["ENS"] = np.mean([pd.Series(v).rank(pct=True) for v in oof.values()], axis=0)
+    cv = []
     for k, v in oof.items():
-        print(f"    {k:4s}  PR-AUC {average_precision_score(y, v):.3f}   "
-              f"ROC-AUC {roc_auc_score(y, v):.3f}")
-    eo = np.mean([pd.Series(v).rank(pct=True) for v in oof.values()], axis=0)
-    print(f"    ENS   PR-AUC {average_precision_score(y, eo):.3f}   "
-          f"ROC-AUC {roc_auc_score(y, eo):.3f}")
+        cv.append({"modelo": k, "PR_AUC": average_precision_score(y, v),
+                   "ROC_AUC": roc_auc_score(y, v)})
+        print(f"    {k:4s}  PR-AUC {cv[-1]['PR_AUC']:.3f}   ROC-AUC {cv[-1]['ROC_AUC']:.3f}")
+    pd.DataFrame(cv).to_csv(f"{OUT}/resultados_cv.csv", index=False)
 
     MF = hacer_modelos(y)
     F["p_potencial"] = np.mean(
         [pd.Series(m.predict_proba(sc.transform(X) if t == "s" else X)[:, 1]).rank(pct=True)
          for t, sc, m in MF.values()], axis=0)
     imp = pd.Series(MF["RF"][2].feature_importances_, index=PRED).sort_values(ascending=False)
+    imp.rename_axis("variable").rename("importancia").to_csv(f"{OUT}/importancia_variables.csv")
     print("\n    Top 10 variables:")
     print("    " + imp.head(10).round(4).to_string().replace("\n", "\n    "))
     return F
@@ -373,7 +376,7 @@ def score(F, grid, gasto_mes=180, w_pot=0.45, pen_mass=0.60, radio=800, pob_min=
     out = gpd.GeoDataFrame(out, geometry="geometry", crs="EPSG:4326")
     cen = out.to_crs(UTM).geometry.centroid.to_crs(4326)
     out["lat"], out["lon"] = cen.y, cen.x
-    out.to_parquet("resultado_final.parquet")
+    out.to_parquet(f"{OUT}/resultado_final.parquet")
 
     top = out[out["viable"]].nlargest(20, "SCORE")
     print(f"\n    --- TOP 20 UBICACIONES ---")
@@ -392,5 +395,5 @@ if __name__ == "__main__":
     F = modelos(F)
     out = score(F, grid)
     print("\n=== PIPELINE COMPLETO ===")
-    print("  grid.parquet · features.parquet · resultado_final.parquet")
-    print("  resultados_backtesting.csv")
+    print(f"  en {OUT}/: grid.parquet · features.parquet · resultado_final.parquet")
+    print("  resultados_backtesting.csv · resultados_cv.csv · importancia_variables.csv")

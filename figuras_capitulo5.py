@@ -7,10 +7,17 @@ variables, comparacion de modelos, distribucion territorial del Top-50, pesos
 elicitados por AHP, puntajes SUS, dimensiones TAM, resultados por perfil de
 usuario y comparacion entre las dos estrategias de validacion.
 """
+import glob
+
+import geopandas as gpd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+
+RES = "resultados"
+FIG = "figuras"
 
 plt.rcParams.update({
     "font.size": 10, "figure.dpi": 200, "savefig.dpi": 200,
@@ -26,17 +33,21 @@ CARMIN = "#B23A5B"
 
 def guardar(fig, nombre):
     fig.tight_layout()
-    fig.savefig(nombre, bbox_inches="tight", facecolor="white")
+    fig.savefig(f"{FIG}/{nombre}", bbox_inches="tight", facecolor="white")
     plt.close(fig)
     print(f"  >> {nombre}")
 
 
-var = ["Población del hexágono", "Densidad poblacional",
-       "Población alcanzable a 500 m", "Población del anillo externo",
-       "POIs generadores a 500 m", "Colegios a 500 m",
-       "Población alcanzable a 800 m", "Número de manzanas",
-       "Densidad de intersecciones", "Metros de vía principal"]
-imp = [.1615, .1556, .0811, .0777, .0607, .0505, .0491, .0440, .0384, .0361]
+ETIQUETAS = {
+    "pob_2017": "Población del hexágono", "dens_hab_km2": "Densidad poblacional",
+    "pob_k1": "Población alcanzable a 500 m", "pob_k1_ext": "Población del anillo externo",
+    "n_poi_k1": "POIs generadores a 500 m", "n_colegio_k1": "Colegios a 500 m",
+    "pob_k2": "Población alcanzable a 800 m", "n_mz": "Número de manzanas",
+    "dens_intersec_km2": "Densidad de intersecciones", "long_princ_m": "Metros de vía principal",
+}
+I = pd.read_csv(f"{RES}/importancia_variables.csv").head(10)
+var = [ETIQUETAS.get(v, v) for v in I["variable"]]
+imp = I["importancia"].tolist()
 fig, ax = plt.subplots(figsize=(7.5, 4.4))
 y = np.arange(len(var))[::-1]
 col = [PETROL if v >= .06 else GRIS for v in imp]
@@ -46,16 +57,21 @@ ax.set_xlabel("Importancia relativa (%)")
 ax.set_title("Variables más influyentes del modelo Random Forest", loc="left", weight="bold")
 for yy, v in zip(y, imp):
     ax.text(v * 100 + .25, yy, f"{v*100:.2f} %", va="center", fontsize=8.5)
-ax.set_xlim(0, 19)
-ax.text(.99, .04, "Las tres primeras acumulan 39,8 %", transform=ax.transAxes,
+ax.set_xlim(0, max(imp) * 100 + 3)
+ax.text(.99, .04, f"Las tres primeras acumulan {sum(imp[:3])*100:.1f} %".replace(".", ","), transform=ax.transAxes,
         ha="right", fontsize=8.5, style="italic", color=GRIS)
 guardar(fig, "fig23_importancia_variables.png")
 
-mod = ["Baseline\ndensidad", "Baseline\npoblación", "Baseline\nPOIs",
-       "Regresión\nlogística", "Random\nForest", "XGBoost", "Ensamble"]
-pr = [.080, .092, .062, .101, .103, .089, .108]
-lift = [2.066, 3.099, 2.324, 3.357, 3.616, 3.357, 3.874]
-es_base = [True, True, True, False, False, False, False]
+NOMBRES_BT = {
+    "Baseline densidad": "Baseline\ndensidad", "Baseline pob. k1": "Baseline\npoblación",
+    "Baseline POIs k1": "Baseline\nPOIs", "Regresion logistica": "Regresión\nlogística",
+    "Random Forest": "Random\nForest", "XGBoost": "XGBoost", "Ensamble (rank avg)": "Ensamble",
+}
+BT = pd.read_csv(f"{RES}/resultados_backtesting.csv").set_index("modelo").loc[list(NOMBRES_BT)]
+mod = list(NOMBRES_BT.values())
+pr = BT["PR_AUC"].tolist()
+lift = BT["Lift@10%"].tolist()
+es_base = [m.startswith("Baseline") for m in BT.index]
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(10.5, 4.2))
 x = np.arange(len(mod))
 c = [GRIS if b else PETROL for b in es_base]
@@ -64,23 +80,32 @@ a1.bar(x, pr, color=c)
 a1.set_xticks(x); a1.set_xticklabels(mod, fontsize=8)
 a1.set_ylabel("PR-AUC"); a1.set_title("Área bajo la curva precisión-recall", loc="left", weight="bold")
 for xx, v in zip(x, pr): a1.text(xx, v + .002, f"{v:.3f}", ha="center", fontsize=8)
-a1.set_ylim(0, .125)
+a1.set_ylim(0, max(pr) * 1.15)
 a2.bar(x, lift, color=c)
 a2.axhline(3, color=CARMIN, ls="--", lw=1.4)
-a2.text(len(mod) - .4, 3.06, "Criterio: Lift ≥ 3", ha="right", color=CARMIN, fontsize=8.5)
+a2.text(-.4, max(max(lift), 3) * 1.12, "- - Criterio: Lift ≥ 3", ha="left", color=CARMIN, fontsize=8.5)
 a2.set_xticks(x); a2.set_xticklabels(mod, fontsize=8)
 a2.set_ylabel("Lift en el decil superior")
 a2.set_title("Concentración de aperturas en el decil superior", loc="left", weight="bold")
 for xx, v in zip(x, lift): a2.text(xx, v + .06, f"{v:.2f}", ha="center", fontsize=8)
-a2.set_ylim(0, 4.6)
+a2.set_ylim(0, max(max(lift), 3) * 1.18)
 guardar(fig, "fig24_comparacion_modelos.png")
 
-dist = ["Jacobo Hunter", "Socabaya", "Cerro Colorado", "Miraflores", "Tiabaya",
-        "Mariano Melgar", "Cayma", "Yura", "Uchumayo", "Yanahuara",
-        "Sachaca", "Paucarpata", "Alto Selva Alegre"]
-n = [10, 9, 8, 7, 3, 3, 2, 2, 2, 1, 1, 1, 1]
-pob = [49454, 75145, 196909, 60361, 16065, 62051, 91197, 32926, 13978,
-       25247, 23913, 131073, 85757]
+UBIGEOS = {
+    "040101": "AREQUIPA", "040102": "ALTO SELVA ALEGRE", "040103": "CAYMA",
+    "040104": "CERRO COLORADO", "040105": "CHARACATO", "040107": "JACOBO HUNTER",
+    "040109": "MARIANO MELGAR", "040110": "MIRAFLORES", "040112": "PAUCARPATA",
+    "040116": "SABANDIA", "040117": "SACHACA", "040122": "SOCABAYA",
+    "040123": "TIABAYA", "040124": "UCHUMAYO", "040126": "YANAHUARA",
+    "040128": "YURA", "040129": "JLBR",
+}
+mz = gpd.read_file(glob.glob("data/inei/*Manzanas_Poblacion*.dbf")[0], ignore_geometry=True)
+pob_dist = mz.groupby(mz["UBIGEO"].map(UBIGEOS))["T_TOTAL"].sum()
+R = pd.read_parquet(f"{RES}/resultado_final.parquet")
+top50 = R[R["viable"]].nlargest(50, "SCORE")["DIST"].value_counts()
+dist = [d.title() for d in top50.index]
+n = top50.tolist()
+pob = [int(pob_dist[d]) for d in top50.index]
 fig, ax = plt.subplots(figsize=(8.4, 4.6))
 y = np.arange(len(dist))[::-1]
 col = [NARANJA if v >= 7 else PETROL for v in n]
@@ -91,7 +116,7 @@ ax.set_title("Distribución territorial de las oportunidades identificadas",
              loc="left", weight="bold")
 for yy, v, p in zip(y, n, pob):
     ax.text(v + .18, yy, f"{v}   ({p:,} hab.)".replace(",", " "), va="center", fontsize=8)
-ax.set_xlim(0, 15)
+ax.set_xlim(0, max(n) + 5)
 guardar(fig, "fig25_distribucion_territorial.png")
 
 crit = ["Demanda\nalcanzable", "Perfil\nde sitio", "Amenaza de\nretail moderno",
@@ -191,8 +216,10 @@ for xx, v in zip(x, tam_p): a2.text(xx, v + .03, f"{v:.2f}", ha="center", fontsi
 guardar(fig, "fig29_perfil_usuario.png")
 
 mods = ["Regresión\nlogística", "Random\nForest", "XGBoost", "Ensamble"]
-roc_cv = [.875, .929, .920, .919]
-roc_bt = [.787, .777, .780, .798]
+CV = pd.read_csv(f"{RES}/resultados_cv.csv").set_index("modelo")
+roc_cv = CV.loc[["LR", "RF", "XGB", "ENS"], "ROC_AUC"].tolist()
+roc_bt = BT.loc[["Regresion logistica", "Random Forest", "XGBoost", "Ensamble (rank avg)"],
+                "ROC_AUC"].tolist()
 fig, ax = plt.subplots(figsize=(7.6, 4.3))
 x = np.arange(4); w = .36
 ax.bar(x - w/2, roc_cv, w, label="Validación cruzada espacial", color=PETROL)

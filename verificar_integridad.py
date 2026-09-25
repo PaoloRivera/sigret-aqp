@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 
 DATA = "data"
+OUT = "resultados"
 UBIGEOS = {
     "040101", "040102", "040103", "040104", "040105", "040107", "040109",
     "040110", "040112", "040116", "040117", "040122", "040123", "040124",
@@ -38,7 +39,7 @@ mz = gpd.read_file(shp)
 mz = mz[mz["UBIGEO"].isin(UBIGEOS)]
 pob_mz = pd.to_numeric(mz["T_TOTAL"], errors="coerce").fillna(0).sum()
 
-grid = gpd.read_parquet("grid.parquet")
+grid = gpd.read_parquet(f"{OUT}/grid.parquet")
 pob_hx = grid["pob_2017"].sum()
 err = abs(pob_hx - pob_mz) / pob_mz * 100
 
@@ -62,7 +63,7 @@ chk("Composicion de la malla",
     "Nucleo censado + anillo de expansion = total de celdas",
     f"{n_nuc:,} nucleo + {n_ani:,} anillo = {n_tot:,}", n_nuc + n_ani == n_tot)
 
-mp = gpd.read_parquet("mass_panel.parquet")
+mp = gpd.read_parquet(f"{OUT}/mass_panel.parquet")
 crudos = mp["codigo"].astype(str).str.strip().nunique()
 norm = (mp["codigo"].astype(str).str.strip().str.upper()
         .str.replace(r"\s+", " ", regex=True).nunique())
@@ -71,7 +72,7 @@ chk("Normalizacion de codigos del panel historico",
     "El conteo de tiendas unicas no varia tras normalizar capitalizacion",
     f"{crudos} sin normalizar vs {norm} normalizado", crudos == norm)
 
-F = pd.read_parquet("features.parquet")
+F = pd.read_parquet(f"{OUT}/features.parquet")
 num = F.select_dtypes(include=[np.number])
 n_inf = int(np.isinf(num.values).sum())
 n_nan = int(num.isna().sum().sum())
@@ -102,7 +103,7 @@ chk("Independencia de las particiones espaciales",
     f"{bloque.nunique()} bloques, {comp} compartidos", comp == 0)
 
 try:
-    R = pd.read_csv("resultados_backtesting.csv")
+    R = pd.read_csv(f"{OUT}/resultados_backtesting.csv")
     ok = len(R) >= 7
     chk("Comparacion contra lineas base univariadas",
         "El backtesting evalua los 4 modelos y las 3 lineas base",
@@ -111,6 +112,6 @@ except FileNotFoundError:
     pass
 
 T = pd.DataFrame(filas)
-T.to_csv("tabla5_integridad.csv", index=False, encoding="utf-8-sig")
+T.to_csv(f"{OUT}/tabla5_integridad.csv", index=False, encoding="utf-8-sig")
 print(T.to_string(index=False))
 print("\n>> tabla5_integridad.csv generada")

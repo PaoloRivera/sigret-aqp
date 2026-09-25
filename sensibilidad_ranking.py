@@ -17,7 +17,7 @@ RADIO = 800
 POB_MIN = 1500
 UMBRAL = 0.70
 
-F = gpd.read_parquet("resultado_final.parquet")
+F = gpd.read_parquet("resultados/resultado_final.parquet")
 
 
 def calcular_score(w_pot=W_POT, pen_mass=PEN_MASS, radio=RADIO, pob_min=POB_MIN):
@@ -47,7 +47,7 @@ for nombre, fn in parametros.items():
                       "permanencia": len(top & base_top10) / 10})
 
 T = pd.DataFrame(filas)
-T.to_csv("tabla_sensibilidad.csv", index=False, encoding="utf-8-sig")
+T.to_csv("resultados/tabla_sensibilidad.csv", index=False, encoding="utf-8-sig")
 
 plt.rcParams.update({"font.size": 11, "figure.dpi": 150})
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -67,7 +67,7 @@ ax.set_xticks(range(-20, 21, 5))
 ax.grid(alpha=0.25)
 ax.legend(frameon=False, loc="lower center", fontsize=9)
 fig.tight_layout()
-fig.savefig("figura22_sensibilidad.png", bbox_inches="tight")
+fig.savefig("figuras/figura22_sensibilidad.png", bbox_inches="tight")
 
 print(T.pivot(index="variacion_pct", columns="parametro",
               values="permanencia").round(2).to_string())
