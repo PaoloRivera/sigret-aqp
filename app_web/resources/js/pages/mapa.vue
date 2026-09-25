@@ -2,7 +2,7 @@
 import HexMap from '@/views/sigret/HexMap.vue'
 import ScoreControls from '@/views/sigret/ScoreControls.vue'
 import ScoreLegend from '@/views/sigret/ScoreLegend.vue'
-import { useSigret } from '@/stores/sigret'
+import { UMBRAL_ENTRADA_CADENA, useSigret } from '@/stores/sigret'
 
 const store = useSigret()
 const nf = new Intl.NumberFormat('es-PE')
@@ -161,6 +161,16 @@ const top5 = computed(() => store.ranking.slice(0, 5))
               >
                 Sin presencia de hard discount en
                 {{ Math.round(sel.d_mass_2026) }} m a la redonda.
+              </VAlert>
+
+              <VAlert
+                v-if="sel.p_potencial >= UMBRAL_ENTRADA_CADENA"
+                type="info" variant="tonal" density="compact" class="mt-2"
+                icon="bx-trending-up"
+              >
+                Alta probabilidad de entrada de la cadena: la zona tiene el
+                perfil donde la cadena suele abrir. La oportunidad existe hoy,
+                pero conviene planificar la diferenciación desde el inicio.
               </VAlert>
 
               <div class="d-flex gap-2 mt-4">

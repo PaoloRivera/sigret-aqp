@@ -11,6 +11,7 @@ Procedencia, licencia y volumen de cada fuente empleada por el pipeline.
 | `osm/poi_flujo.parquet` | 3 072 puntos de interés generadores de flujo | Overpass API | ODbL |
 | `osm/red_nodes.parquet` | Nodos de la red vial caminable | OSMnx | ODbL |
 | `osm/red_edges.parquet` | Aristas de la red vial con longitud y jerarquía | OSMnx | ODbL |
+| `osm_2024/` | Competencia, POIs y red vial al 31-12-2024 (predictores del backtesting) | Overpass API, consulta histórica | ODbL |
 | `osm/lugares.parquet` | Urbanizaciones, asentamientos y barrios con nombre | Overpass API | ODbL |
 | `mass/mass_ubicame.html` | Snapshot actual del localizador de tiendas | Sitio web público | Público |
 | `mass/wayback/*.html` | Snapshots anuales del mismo localizador (2023–2026) | Internet Archive | Público |

@@ -7,3 +7,5 @@ Integridad numerica de la matriz de caracteristicas,La matriz no contiene valore
 Exclusion de variables con fuga de informacion,Ningun predictor deriva de la red de retail moderno,"37 predictores, 0 variables de fuga",Si
 Independencia de las particiones espaciales,Ningun bloque H3 r6 aparece en entrenamiento y prueba simultaneamente,"52 bloques, 0 compartidos",Si
 Comparacion contra lineas base univariadas,El backtesting evalua los 4 modelos y las 3 lineas base,7 modelos evaluados,Si
+Exclusion de locales de la cadena en la competencia OSM,Ningun competidor OSM coincide por nombre o a menos de 50 m con un local de la cadena,"2024: 154 competidores, 0 coincidencias; 2026: 169 competidores, 0 coincidencias",Si
+Corte temporal de los predictores del backtesting,Los predictores del backtesting provienen de capas OSM con fecha <= 2024-12-31,capas OSM al 2024-12-31; 154 competidores en la matriz de 2024,Si

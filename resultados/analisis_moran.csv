@@ -1,4 +1,5 @@
-variable,I_Moran,p_valor
-Variable objetivo (tienda en 2026),0.05927844532099076,0.001
-Residuos fuera de muestra de Random Forest,0.05121817432031702,0.001
-Poblacion de la celda,0.7924561241509208,0.001
+variable,I_Moran,p_valor,z
+Variable objetivo (tienda de la cadena en 2026),0.059278445320990775,0.001,5.995738861602968
+"Residuos RF, validacion aleatoria",0.058830630613522374,0.001,5.906028005206358
+"Residuos RF, validacion espacial en bloques",0.04914508313955128,0.001,4.967909894605439
+Poblacion de la celda,0.7924561241509209,0.001,74.6038094391832
