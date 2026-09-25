@@ -8,6 +8,7 @@ elicitados por AHP, puntajes SUS, dimensiones TAM, resultados por perfil de
 usuario y comparacion entre las dos estrategias de validacion.
 """
 import glob
+import os
 
 import geopandas as gpd
 import matplotlib
@@ -18,6 +19,7 @@ import pandas as pd
 
 RES = "resultados"
 FIG = "figuras"
+os.makedirs(FIG, exist_ok=True)
 
 plt.rcParams.update({
     "font.size": 10, "figure.dpi": 200, "savefig.dpi": 200,
@@ -60,7 +62,7 @@ for yy, v in zip(y, imp):
 ax.set_xlim(0, max(imp) * 100 + 3)
 ax.text(.99, .04, f"Las tres primeras acumulan {sum(imp[:3])*100:.1f} %".replace(".", ","), transform=ax.transAxes,
         ha="right", fontsize=8.5, style="italic", color=GRIS)
-guardar(fig, "fig23_importancia_variables.png")
+guardar(fig, "figura20_importancia_variables.png")
 
 NOMBRES_BT = {
     "Baseline densidad": "Baseline\ndensidad", "Baseline pob. k1": "Baseline\npoblación",
@@ -89,7 +91,7 @@ a2.set_ylabel("Lift en el decil superior")
 a2.set_title("Concentración de aperturas en el decil superior", loc="left", weight="bold")
 for xx, v in zip(x, lift): a2.text(xx, v + .06, f"{v:.2f}", ha="center", fontsize=8)
 a2.set_ylim(0, max(max(lift), 3) * 1.18)
-guardar(fig, "fig24_comparacion_modelos.png")
+guardar(fig, "figura21_comparacion_modelos.png")
 
 UBIGEOS = {
     "040101": "AREQUIPA", "040102": "ALTO SELVA ALEGRE", "040103": "CAYMA",
@@ -117,7 +119,7 @@ ax.set_title("Distribución territorial de las oportunidades identificadas",
 for yy, v, p in zip(y, n, pob):
     ax.text(v + .18, yy, f"{v}   ({p:,} hab.)".replace(",", " "), va="center", fontsize=8)
 ax.set_xlim(0, max(n) + 5)
-guardar(fig, "fig25_distribucion_territorial.png")
+guardar(fig, "figura23_distribucion_territorial.png")
 
 crit = ["Demanda\nalcanzable", "Amenaza de\nretail moderno", "Perfil\nde sitio",
         "Competencia\ninstalada"]
@@ -145,7 +147,7 @@ for xx, a, b in zip(x, prov, elic):
     a2.text(xx - w/2, a + .015, f"{a:.3f}", ha="center", fontsize=8)
     a2.text(xx + w/2, b + .015, f"{b:.3f}", ha="center", fontsize=8)
 a2.set_ylim(0, .95)
-guardar(fig, "fig26_pesos_ahp.png")
+guardar(fig, "figura24_pesos_ahp.png")
 
 S = np.array([77.5, 85.0, 65.0, 80.0, 72.5, 82.5, 67.5, 87.5, 75.0, 80.0,
               70.0, 90.0, 75.0, 77.5, 82.5])
@@ -171,7 +173,7 @@ a2.axvline(S.mean(), color=NARANJA, lw=2)
 a2.text(S.mean() + .4, 2.2, f"M = {S.mean():.2f}", fontsize=8.5, color=NARANJA, weight="bold")
 a2.set_xlabel("Puntaje SUS"); a2.set_ylabel("Frecuencia")
 a2.set_title("Histograma de puntajes individuales", loc="left", weight="bold")
-guardar(fig, "fig27_sus_rangos.png")
+guardar(fig, "figura26_distribucion_sus.png")
 
 dim = ["Utilidad\npercibida", "Facilidad de uso\npercibida", "Intención\nde uso"]
 m = [4.16, 4.09, 4.16]
@@ -188,7 +190,7 @@ ax.set_ylim(1, 5.2)
 ax.set_title("Aceptación tecnológica por dimensión (n = 15)", loc="left", weight="bold")
 for xx, v, s in zip(x, m, de):
     ax.text(xx, v + s + .09, f"{v:.2f}", ha="center", fontsize=9.5, weight="bold")
-guardar(fig, "fig28_tam_dimensiones.png")
+guardar(fig, "figura27_dimensiones_tam.png")
 
 perfiles = ["Corredores\ninmobiliarios", "Estudiantes\nde posgrado",
             "Docentes\ndel área", "Propietarios\nde minimarket"]
@@ -213,7 +215,7 @@ a2.set_xticks(x); a2.set_xticklabels(perfiles, fontsize=8)
 a2.set_ylabel("TAM global (1 – 5)"); a2.set_ylim(3.2, 4.8)
 a2.set_title("Aceptación tecnológica por perfil", loc="left", weight="bold")
 for xx, v in zip(x, tam_p): a2.text(xx, v + .03, f"{v:.2f}", ha="center", fontsize=8.5)
-guardar(fig, "fig29_perfil_usuario.png")
+guardar(fig, "figura28_resultados_perfil.png")
 
 mods = ["Regresión\nlogística", "Random\nForest", "XGBoost", "Ensamble"]
 CV = pd.read_csv(f"{RES}/resultados_cv.csv").set_index("modelo")
@@ -234,6 +236,6 @@ ax.legend(frameon=False, fontsize=8.5, loc="lower right")
 for xx, a, b in zip(x, roc_cv, roc_bt):
     ax.text(xx - w/2, a + .01, f"{a:.3f}", ha="center", fontsize=8)
     ax.text(xx + w/2, b + .01, f"{b:.3f}", ha="center", fontsize=8)
-guardar(fig, "fig30_validaciones.png")
+guardar(fig, "figura22_desempeno_validaciones.png")
 
 print("\nOcho figuras generadas.")

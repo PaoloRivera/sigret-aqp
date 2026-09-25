@@ -2,10 +2,12 @@
 """
 sensibilidad_ranking.py
 
-Genera la Figura 22 del Capitulo IV: mide cuanto permanece el Top-10 de
+Genera la Figura 25: mide cuanto permanece el Top-10 de
 ubicaciones cuando se varian los pesos y umbrales del score entre -20 % y
 +20 %, y guarda la curva de sensibilidad junto con la tabla de datos crudos.
 """
+import os
+
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -68,11 +70,12 @@ ax.set_xticks(range(-20, 21, 5))
 ax.grid(alpha=0.25)
 ax.legend(frameon=False, loc="lower center", fontsize=9)
 fig.tight_layout()
-fig.savefig("figuras/figura22_sensibilidad.png", bbox_inches="tight")
+os.makedirs("figuras", exist_ok=True)
+fig.savefig("figuras/figura25_sensibilidad_ranking.png", bbox_inches="tight")
 
 print(T.pivot(index="variacion_pct", columns="parametro",
               values="permanencia").round(2).to_string())
 minimo = T["permanencia"].min()
 print(f"\nPermanencia minima observada: {minimo:.0%}")
 print(f"Criterio (>= {UMBRAL:.0%}): {'CUMPLE' if minimo >= UMBRAL else 'NO CUMPLE'}")
-print("\n>> figura22_sensibilidad.png y tabla_sensibilidad.csv generadas")
+print("\n>> figura25_sensibilidad_ranking.png y tabla_sensibilidad.csv generadas")
