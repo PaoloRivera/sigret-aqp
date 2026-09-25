@@ -1,0 +1,11 @@
+<svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Retícula hexagonal: la unidad de análisis del sistema -->
+  <path d="M15 1.6 L26.3 8.2 L26.3 21.4 L15 28 L3.7 21.4 L3.7 8.2 Z"
+        stroke="#0E7C86" stroke-width="1.9" stroke-linejoin="round" opacity=".34"/>
+  <path d="M15 8.4 L21.1 12 L21.1 19.2 L15 22.8 L8.9 19.2 L8.9 12 Z"
+        fill="#0E7C86" opacity=".2"/>
+  <path d="M15 8.4 L21.1 12 L21.1 19.2 L15 22.8 L8.9 19.2 L8.9 12 Z"
+        stroke="#0E7C86" stroke-width="1.9" stroke-linejoin="round"/>
+  <!-- Punto de localización -->
+  <circle cx="15" cy="15.6" r="2.6" fill="#0E7C86"/>
+</svg>

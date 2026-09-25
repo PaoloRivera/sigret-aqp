@@ -2,22 +2,23 @@
 """
 05_empaquetar.py
 
-Arma el paquete de datos para subir: convierte las capas OSM y la red vial a
-parquet normalizando los tipos mixtos, copia los CSV, rasters y snapshots
-generados por los demas scripts y comprime todo en tesis_data.zip.
+Deja los datos de entrada en data/, con la estructura que espera pipeline.py:
+convierte las capas OSM y la red vial a parquet normalizando los tipos mixtos
+y copia la cartografia censal, los CSV y los snapshots generados por las
+rutinas 01 a 09 (que escriben en out/ y raw/).
+
+Uso (desde la raiz del proyecto):
+    python scripts/05_empaquetar.py
 """
 
 import os
 import shutil
-import zipfile
 
 import geopandas as gpd
 import pandas as pd
 
-PAQ = "paquete"
-if os.path.exists(PAQ):
-    shutil.rmtree(PAQ)
-for sub in ["osm", "sunat", "mass"]:
+PAQ = "data"
+for sub in ["osm", "sunat", "mass", "inei"]:
     os.makedirs(f"{PAQ}/{sub}", exist_ok=True)
 
 
@@ -44,13 +45,13 @@ def copiar(origen, destino):
         print(f"  [saltado] no existe {origen}")
 
 
-print("[1/4] Convirtiendo capas OSM de puntos...")
+print("[1/3] Convirtiendo capas OSM de puntos...")
 gj_a_parquet("out/osm_competencia.geojson", f"{PAQ}/osm/competencia.parquet")
 gj_a_parquet("out/osm_poi_flujo.geojson", f"{PAQ}/osm/poi_flujo.parquet")
 gj_a_parquet("out/osm_lugares.geojson", f"{PAQ}/osm/lugares.parquet")
 gj_a_parquet("out/osm_distritos.geojson", f"{PAQ}/osm/distritos.parquet")
 
-print("\n[2/4] Convirtiendo la red vial (esto es lo pesado)...")
+print("\n[2/3] Convirtiendo la red vial (esto es lo pesado)...")
 if os.path.exists("out/osm_red_peatonal.graphml"):
     import osmnx as ox
     G = ox.load_graphml("out/osm_red_peatonal.graphml")
@@ -105,7 +106,7 @@ if os.path.exists("out/osm_red_peatonal.graphml"):
 else:
     print("  [saltado] no existe out/osm_red_peatonal.graphml")
 
-print("\n[3/4] Copiando CSV...")
+print("\n[3/3] Copiando cartografia censal, CSV y snapshots...")
 os.makedirs(f"{PAQ}/inei", exist_ok=True)
 copiar("out/worldpop_arequipa.tif", f"{PAQ}/inei/")
 copiar("out/distritos_arequipa.geojson", f"{PAQ}/inei/")
@@ -135,15 +136,5 @@ if os.path.isdir("raw/wayback"):
             n += 1
     print(f"  copiados {n} snapshots de wayback")
 
-print("\n[4/4] Comprimiendo...")
-with zipfile.ZipFile("tesis_data.zip", "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-    for raiz, _, archivos in os.walk(PAQ):
-        for a in archivos:
-            ruta = os.path.join(raiz, a)
-            z.write(ruta, os.path.relpath(ruta, PAQ))
-
-mb = os.path.getsize("tesis_data.zip") / 1e6
-print(f"\n=== LISTO ===")
-print(f"  tesis_data.zip -> {mb:.1f} MB")
-if mb > 100:
-    print("  OJO: pesa mas de 100 MB. Borra la carpeta paquete/mass/wayback/")
+print("\n=== LISTO ===")
+print(f"  datos de entrada en {PAQ}/  ->  siguiente paso: python pipeline.py")

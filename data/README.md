@@ -13,7 +13,7 @@ Procedencia, licencia y volumen de cada fuente empleada por el pipeline.
 | `osm/red_edges.parquet` | Aristas de la red vial con longitud y jerarquía | OSMnx | ODbL |
 | `osm/lugares.parquet` | Urbanizaciones, asentamientos y barrios con nombre | Overpass API | ODbL |
 | `mass/mass_ubicame.html` | Snapshot actual del localizador de tiendas | Sitio web público | Público |
-| `mass/wayback/*.html` | Cuatro snapshots anuales del mismo localizador | Internet Archive | Público |
+| `mass/wayback/*.html` | Snapshots anuales del mismo localizador (2023–2026) | Internet Archive | Público |
 | `sunat/sunat_bodegas_arequipa.csv` | Establecimientos de abarrotes filtrados del padrón | SUNAT, datos abiertos | Datos abiertos |
 
 > **Atribución obligatoria.** Los archivos de la carpeta `osm/` derivan de OpenStreetMap y deben acreditarse como *© colaboradores de OpenStreetMap*, conforme exige la Open Database License.
@@ -38,6 +38,11 @@ Los cuatro archivos de `mass/wayback/` son la **evidencia documental de la varia
 
 El nombre de cada archivo codifica la marca temporal exacta del snapshot en formato `AAAAMMDDhhmmss`.
 
+El snapshot de 2023 se conserva como evidencia, pero su marcado no incluye las
+coordenadas de las tiendas y el pipeline no extrae registros de él. La serie
+utilizable consta de cuatro cortes: los snapshots de 2024, 2025 y 2026 más la
+versión vigente del localizador (`mass/mass_ubicame.html`).
+
 ## Estructura esperada por el pipeline
 
 `pipeline.py` espera esta disposición exacta:
@@ -52,3 +57,19 @@ data/
 ├── mass/mass_ubicame.html
 └── mass/wayback/*.html
 ```
+
+## Panel de expertos
+
+`calcular_ahp.py` lee las comparaciones pareadas del panel desde
+`panel/matrices_ahp.csv`, con una fila por comparación:
+
+```
+experto,criterio_a,criterio_b,valor
+E01,C1,C2,3
+E01,C1,C3,5
+...
+```
+
+`criterio_a` y `criterio_b` son las claves C1 a C4 del Anexo D de la tesis y `valor`
+es el juicio en la escala de Saaty (1 a 9, o su recíproco si pesa más `criterio_b`).
+Cada experto aporta seis comparaciones.

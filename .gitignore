@@ -33,8 +33,8 @@ cache/
 tesis_data.zip
 
 # ── Laravel ─────────────────────────────────────────────────────────
-app_web/storage/framework/
-app_web/storage/logs/
+# storage/ conserva sus carpetas mediante .gitignore internos (Laravel)
+app_web/storage/logs/*.log
 app_web/public/build/
 app_web/public/hot
 
@@ -47,3 +47,6 @@ desktop.ini
 ~$*
 *.tmp
 TESIS/
+
+# ── Configuración local del asistente ───────────────────────────────
+.claude/

@@ -85,7 +85,7 @@ def main():
         feats = descargar(usar_bbox=False)
 
     if not feats:
-        print("\n!!! No se descargo nada. Rutas alternativas:")
+        print("\n[!] No se descargo nada. Rutas alternativas:")
         print("    1) https://www.geogpsperu.com/2020/09/manzanas-y-poblacion-de-todo-el-peru.html")
         print("    2) https://www.geogpsperu.com/2024/09/manzanas-urbanas-censo-2017-gratis.html")
         return
