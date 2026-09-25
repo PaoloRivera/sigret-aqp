@@ -50,7 +50,7 @@ const stack = [
   { g: 'Geoprocesamiento', i: ['GeoPandas', 'Shapely', 'h3-py', 'SciPy'] },
   { g: 'Aprendizaje automático', i: ['scikit-learn', 'XGBoost'] },
   { g: 'Interfaz', i: ['Vue 3', 'Vuetify', 'Pinia', 'ApexCharts'] },
-  { g: 'Cartografía', i: ['MapLibre GL', 'h3-js', 'CARTO'] },
+  { g: 'Cartografía', i: ['MapLibre GL', 'h3-js', 'OpenFreeMap'] },
   { g: 'Backend', i: ['Laravel', 'Vite'] },
   { g: 'Formatos', i: ['Apache Parquet', 'GeoJSON'] },
 ]

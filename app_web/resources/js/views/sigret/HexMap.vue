@@ -34,22 +34,9 @@ const contenedor = ref(null)
 let map = null
 let popup = null
 
-const ESTILO_BASE = {
-  version: 8,
-  sources: {
-    carto: {
-      type: 'raster',
-      tiles: [
-        'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-        'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-        'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-      ],
-      tileSize: 256,
-      attribution: '© CARTO © OpenStreetMap',
-    },
-  },
-  layers: [{ id: 'base', type: 'raster', source: 'carto' }],
-}
+// OpenFreeMap: teselas vectoriales de OpenStreetMap sin clave de API, sin
+// registro y sin límite de vistas. La atribución la aporta el propio estilo.
+const ESTILO_BASE = 'https://tiles.openfreemap.org/styles/dark'
 
 // Construye el GeoJSON de hexágonos con el score ya normalizado
 function construirGeoJSON() {
