@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 """
 10_generar_json_app.py
-Regenera los cuatro JSON que consume la aplicacion web a partir de las
-salidas actuales del pipeline.
 
-ESTE ES EL PASO QUE FALTABA: pipeline.py produce .parquet, pero la app web
-sirve .json. Sin este script los JSON quedan congelados en la corrida que
-se hizo a mano y la aplicacion muestra metricas distintas a las de la tesis.
+Convierte las salidas de pipeline.py (carpeta resultados/) en los cuatro JSON
+que consume la aplicacion web, de modo que la aplicacion muestre siempre las
+mismas metricas que la corrida del pipeline.
 
 Uso (desde la raiz del proyecto, tras ejecutar pipeline.py):
     python scripts/10_generar_json_app.py
 
-Salidas (se escriben en DESTINO, ver abajo):
+Salidas (en app_web/public/data/):
     hexes.json         3,717 celdas x 25 columnas, formato de matriz
     mass.json          panel de tiendas con anio de apertura
     competencia.json   comercios de OpenStreetMap

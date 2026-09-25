@@ -1,35 +1,47 @@
-# vue
+# Aplicación web de SIGRET-AQP
 
-This template should help get you started developing with Vue 3 in Vite.
+Interfaz de soporte a la decisión construida con Vue 3, Vuetify, Pinia, MapLibre GL
+y h3-js, servida por Laravel. Todo el cálculo pesado ocurre fuera de línea en el
+pipeline de Python: la aplicación solo lee los cuatro JSON de `public/data/` y
+recalcula el score en el navegador. No usa base de datos.
 
-## Recommended IDE Setup
+## Requisitos
 
-[VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur).
+- PHP 8.2 o superior y Composer
+- Node.js 20 o superior y pnpm 9 (`npm install -g pnpm@9`)
 
-## Type Support for `.vue` Imports in TS
+## Puesta en marcha
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates.
-
-However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can run `Volar: Switch TS Plugin on/off` from VS Code command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+pnpm install
+pnpm build
+php artisan serve
 ```
 
-### Compile and Hot-Reload for Development
+La aplicación queda en http://localhost:8000. Para desarrollo con recarga en caliente,
+ejecutar `pnpm dev` en otra terminal en lugar de `pnpm build`.
 
-```sh
-npm run dev
+## Actualizar los datos
+
+Los JSON de `public/data/` se generan desde la raíz del proyecto, después de ejecutar
+`pipeline.py`:
+
+```bash
+python scripts/10_generar_json_app.py
 ```
 
-### Type-Check, Compile and Minify for Production
+## Estructura relevante
 
-```sh
-npm run build
 ```
+resources/js/
+├── pages/            Resumen, mapa, ranking, simulador, validación y fuentes
+├── stores/sigret.js  Carga de datos, score y modelo de Huff (estado central)
+└── views/sigret/     Mapa de hexágonos, controles del modelo y componentes propios
+public/data/          Datos servidos (generados por el pipeline)
+```
+
+La interfaz parte de la plantilla libre Sneat 2.1.0 de ThemeSelection (licencia MIT).
+El mapa base es OpenFreeMap, con datos © colaboradores de OpenStreetMap.

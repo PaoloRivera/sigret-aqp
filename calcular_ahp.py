@@ -22,7 +22,7 @@ CRITERIOS = {
 }
 RI = {1: 0.00, 2: 0.00, 3: 0.58, 4: 0.90, 5: 1.12, 6: 1.24, 7: 1.32}
 UMBRAL_CR = 0.10
-ARCHIVO = "matrices_ahp.csv"
+ARCHIVO = "data/panel/matrices_ahp.csv"
 
 W_POT_ACTUAL = 0.45
 PEN_MASS_ACTUAL = 0.60
@@ -90,8 +90,8 @@ T = pd.DataFrame([
     {"Criterio": CRITERIOS[c], "Peso elicitado (AHP)": round(agg[c], 4)}
     for c in claves
 ])
-T.to_csv("tabla11_ahp.csv", index=False, encoding="utf-8-sig")
-C.to_csv("ahp_consistencia.csv", index=False, encoding="utf-8-sig")
+T.to_csv("resultados/tabla14_ahp.csv", index=False, encoding="utf-8-sig")
+C.to_csv("resultados/tabla13_ahp_consistencia.csv", index=False, encoding="utf-8-sig")
 
 print("=== PESOS AGREGADOS (media geometrica del panel) ===")
 print(T.to_string(index=False))
@@ -110,4 +110,4 @@ print()
 print("NOTA: el radio de amenaza NO se obtiene por AHP. Se elicita por pregunta")
 print("      directa al panel y se reporta la mediana de las respuestas.")
 print()
-print(">> tabla11_ahp.csv y ahp_consistencia.csv generadas")
+print(">> resultados/tabla14_ahp.csv y resultados/tabla13_ahp_consistencia.csv generadas")

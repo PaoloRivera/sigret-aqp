@@ -40,7 +40,7 @@ def listar_snapshots():
     r.raise_for_status()
     data = r.json()
     if len(data) < 2:
-        print("      !!! Sin snapshots. Prueba con TARGET = 'tiendasmass.com.pe*'")
+        print("      [!] Sin snapshots. Prueba con TARGET = 'tiendasmass.com.pe*'")
         return pd.DataFrame()
     df = pd.DataFrame(data[1:], columns=data[0])
     df["fecha"] = pd.to_datetime(df["timestamp"], format="%Y%m%d%H%M%S", errors="coerce")
@@ -115,7 +115,7 @@ def main():
             print(f"ERROR: {e}")
 
     if not registros:
-        print("\n!!! No se extrajo nada. Revisa raw/wayback/*.html a mano.")
+        print("\n[!] No se extrajo nada. Revisa raw/wayback/*.html a mano.")
         return
 
     df = pd.DataFrame(registros)

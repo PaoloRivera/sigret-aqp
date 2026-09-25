@@ -118,7 +118,7 @@ def main():
     archivos = sorted(glob.glob("data_sunat/*.txt") + glob.glob("data_sunat/*.csv")
                       + glob.glob("data_sunat/*.TXT"))
     if not archivos:
-        print("!!! No hay archivos en data_sunat/")
+        print("[!] No hay archivos en data_sunat/")
         return
 
     diag = []
@@ -150,8 +150,8 @@ def main():
         f.write("\n".join(diag))
 
     if principal is None:
-        print("\n!!! No encontre el padron principal (el que trae RAZON_SOCIAL).")
-        print("    Mandame out/_diagnostico_columnas.txt")
+        print("\n[!] No encontre el padron principal (el que trae RAZON_SOCIAL).")
+        print("    Revisa out/_diagnostico_columnas.txt para identificar sus columnas.")
         return
 
     if anexos is not None and "RUC" in anexos.columns:

@@ -163,7 +163,7 @@ def main():
 
     df = parsear_html(html)
     if df.empty:
-        print("\n!!! No se parseo nada. Revisa raw/mass_ubicame.html manualmente.")
+        print("\n[!] No se parseo nada. Revisa raw/mass_ubicame.html manualmente.")
         sys.exit(1)
 
     df = marcar_ciudad(df)
@@ -192,7 +192,7 @@ def main():
     print(f"  Arequipa       : {len(aqp)}   <-- este archivo me subes")
     print(f"  -> out/mass_arequipa.csv")
     if len(aqp) < 30:
-        print("\n  OJO: menos de 30 tiendas en Arequipa. Revisa el parseo antes de seguir.")
+        print("\n  [!] Menos de 30 tiendas en Arequipa. Revisa el parseo antes de seguir.")
 
 
 if __name__ == "__main__":
