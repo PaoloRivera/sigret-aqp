@@ -119,13 +119,13 @@ for yy, v, p in zip(y, n, pob):
 ax.set_xlim(0, max(n) + 5)
 guardar(fig, "fig25_distribucion_territorial.png")
 
-crit = ["Demanda\nalcanzable", "Perfil\nde sitio", "Amenaza de\nretail moderno",
+crit = ["Demanda\nalcanzable", "Amenaza de\nretail moderno", "Perfil\nde sitio",
         "Competencia\ninstalada"]
-pes = [.377, .257, .257, .109]
+pes = [.377, .261, .254, .108]
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(10.5, 4.2),
                              gridspec_kw={"width_ratios": [1.15, 1]})
 x = np.arange(len(crit))
-a1.bar(x, [p * 100 for p in pes], color=[PETROL, AMBAR, NARANJA, GRIS])
+a1.bar(x, [p * 100 for p in pes], color=[PETROL, NARANJA, AMBAR, GRIS])
 a1.set_xticks(x); a1.set_xticklabels(crit, fontsize=8.5)
 a1.set_ylabel("Peso elicitado (%)")
 a1.set_title("Pesos del panel de expertos (n = 10)", loc="left", weight="bold")
@@ -134,7 +134,7 @@ a1.set_ylim(0, 45)
 
 par = ["w_pot\n(perfil de sitio)", "pen_mass\n(penalización)", "radio\n(m, escala ÷1000)"]
 prov = [.450, .600, .800]
-elic = [.346, .257, .750]
+elic = [pes[2] / (pes[0] + pes[2] + pes[3]), pes[1], .750]
 x = np.arange(len(par)); w = .36
 a2.bar(x - w/2, prov, w, label="Provisional", color=GRIS)
 a2.bar(x + w/2, elic, w, label="Elicitado (AHP)", color=PETROL)

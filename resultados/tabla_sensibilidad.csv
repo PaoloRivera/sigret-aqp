@@ -1,14 +1,14 @@
 ﻿parametro,variacion_pct,permanencia
-Peso del perfil de sitio,-20,0.9
-Peso del perfil de sitio,-15,0.9
-Peso del perfil de sitio,-10,0.9
-Peso del perfil de sitio,-5,0.9
+Peso del perfil de sitio,-20,1.0
+Peso del perfil de sitio,-15,1.0
+Peso del perfil de sitio,-10,1.0
+Peso del perfil de sitio,-5,1.0
 Peso del perfil de sitio,0,1.0
 Peso del perfil de sitio,5,1.0
 Peso del perfil de sitio,10,1.0
 Peso del perfil de sitio,15,1.0
 Peso del perfil de sitio,20,1.0
-Penalizacion hard discount,-20,0.9
+Penalizacion hard discount,-20,1.0
 Penalizacion hard discount,-15,1.0
 Penalizacion hard discount,-10,1.0
 Penalizacion hard discount,-5,1.0
@@ -17,15 +17,15 @@ Penalizacion hard discount,5,1.0
 Penalizacion hard discount,10,1.0
 Penalizacion hard discount,15,1.0
 Penalizacion hard discount,20,1.0
-Radio de amenaza,-20,0.6
-Radio de amenaza,-15,0.7
-Radio de amenaza,-10,0.8
-Radio de amenaza,-5,0.8
+Radio de amenaza,-20,0.4
+Radio de amenaza,-15,0.8
+Radio de amenaza,-10,0.9
+Radio de amenaza,-5,0.9
 Radio de amenaza,0,1.0
-Radio de amenaza,5,0.7
-Radio de amenaza,10,0.5
-Radio de amenaza,15,0.4
-Radio de amenaza,20,0.3
+Radio de amenaza,5,1.0
+Radio de amenaza,10,0.9
+Radio de amenaza,15,0.8
+Radio de amenaza,20,0.5
 Umbral de poblacion,-20,1.0
 Umbral de poblacion,-15,1.0
 Umbral de poblacion,-10,1.0
