@@ -74,11 +74,11 @@ const cvOpts = computed(() => ({
   },
   annotations: {
     yaxis: [{
-      y: 0.0328,
+      y: store.kpis.tasaBaseCv,
       borderColor: c.value.error,
       strokeDashArray: 4,
       label: {
-        text: 'Tasa base 3.3 %',
+        text: `Tasa base ${(store.kpis.tasaBaseCv * 100).toFixed(1)} %`,
         position: 'left',
         textAnchor: 'start',
         style: { background: c.value.error, color: '#fff', fontSize: '10px' },
@@ -213,8 +213,9 @@ const limitaciones = [
               :options="cvOpts" :series="cvSerie"
             />
             <p class="nota">
-              Con una tasa base de 3.3 %, un PR-AUC de 0.249 equivale a
-              <strong>7.5 veces</strong> el desempeño de una asignación
+              Con una tasa base de {{ (store.kpis.tasaBaseCv * 100).toFixed(1) }} %,
+              un PR-AUC de {{ store.kpis.prAuc.toFixed(3) }} equivale a
+              <strong>{{ store.kpis.prSobreBase.toFixed(1) }} veces</strong> el desempeño de una asignación
               aleatoria en la región de alta precisión, que es la única
               relevante cuando se evalúan 20 ubicaciones y no 3,717.
             </p>
@@ -270,9 +271,10 @@ const limitaciones = [
               </tbody>
             </VTable>
             <p class="nota">
-              El ensamble ubicó <strong>5 de las 39 aperturas reales</strong> en
-              su Top-20, frente a 3 del mejor baseline. Cinco de veinte es
-              modesto en términos absolutos y realista dadas las condiciones:
+              El ensamble ubicó <strong>{{ store.kpis.aciertos20 }} de las 39 aperturas reales</strong> en
+              su Top-20, igual que el mejor baseline, pero concentra
+              {{ store.kpis.lift.toFixed(2) }} veces más aperturas que el azar en su
+              decil superior. Es un resultado modesto y realista dadas las condiciones:
               83 casos de entrenamiento y ausencia de variables de alquiler y
               disponibilidad de locales. Un resultado de 18 sobre 20 debería
               despertar sospecha de fuga de información, no confianza.
@@ -336,7 +338,7 @@ const limitaciones = [
               <div class="ad-col">
                 <div class="ad-lbl">Después</div>
                 <div class="ad-val ad-val--bien">0.109</div>
-                <div class="ad-sub">PR-AUC · 5 aciertos</div>
+                <div class="ad-sub">PR-AUC · 3 aciertos</div>
               </div>
             </div>
 

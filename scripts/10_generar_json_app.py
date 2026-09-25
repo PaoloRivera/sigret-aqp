@@ -9,10 +9,10 @@ sirve .json. Sin este script los JSON quedan congelados en la corrida que
 se hizo a mano y la aplicacion muestra metricas distintas a las de la tesis.
 
 Uso (desde la raiz del proyecto, tras ejecutar pipeline.py):
-    python 10_generar_json_app.py
+    python scripts/10_generar_json_app.py
 
 Salidas (se escriben en DESTINO, ver abajo):
-    hexes.json         3,717 celdas x 24 columnas, formato de matriz
+    hexes.json         3,717 celdas x 25 columnas, formato de matriz
     mass.json          panel de tiendas con anio de apertura
     competencia.json   comercios de OpenStreetMap
     meta.json          backtesting, validacion cruzada, importancias, fuentes
@@ -21,34 +21,24 @@ import json
 import os
 import sys
 
-import geopandas as gpd
-import h3
-import numpy as np
-import pandas as pd
-import xgboost as xgb
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import average_precision_score, roc_auc_score
-from sklearn.model_selection import GroupKFold
-from sklearn.preprocessing import StandardScaler
+import glob
 
-np.random.seed(42)
+import geopandas as gpd
+import pandas as pd
 
 # ── Configuracion ────────────────────────────────────────────────────────
-DESTINO = "vue/vue/javascript-version/public/data"
-RECALCULAR_CV = True     # False = usa los valores de CV_FIJO (mas rapido)
-CV_FIJO = [
-    {"modelo": "Regresión logística", "pr_auc": 0.199, "roc_auc": 0.875},
-    {"modelo": "Random Forest",       "pr_auc": 0.230, "roc_auc": 0.929},
-    {"modelo": "XGBoost",             "pr_auc": 0.247, "roc_auc": 0.920},
-    {"modelo": "Ensamble",            "pr_auc": 0.249, "roc_auc": 0.919},
-]
+RES = "resultados"
+DESTINO = "app_web/public/data"
 
 COLS = ["h3", "dist", "lat", "lon", "pob_2017", "pob_k1", "pob_k2",
         "dens_hab_km2", "n_comp_osm_k1", "mass_k1_2026", "d_mass_2026",
         "n_poi_k1", "n_colegio_k1", "n_salud_k1", "n_mercado_k1",
         "n_comida_k1", "n_transp_k1", "n_banco_k1", "dens_intersec_km2",
-        "long_princ_m", "p_potencial", "dem_res_n", "area_km2", "n_mz"]
+        "long_princ_m", "p_potencial", "dem_res_n", "area_km2", "n_mz", "mass_2026"]
+
+# Coordenadas a 5 decimales (~1 m), indices a 4 y conteos, poblaciones y
+# distancias a enteros, para mantener el JSON liviano
+DECIMALES = {"lat": 5, "lon": 5, "p_potencial": 4, "dem_res_n": 4, "area_km2": 4}
 
 ETIQUETAS = {
     "pob_2017": "Población del hexágono", "dens_hab_km2": "Densidad poblacional",
@@ -67,7 +57,7 @@ ETIQUETAS = {
 
 FUENTES = [
     {"n": "Censo Nacional INEI 2017", "t": "Manzanas con población",
-     "v": "24,655 manzanas · 1,018,031 hab", "l": "Cartografía censal · uso público"},
+     "v": "21,705 manzanas · 1,018,031 hab", "l": "Cartografía censal · uso público"},
     {"n": "OpenStreetMap", "t": "Competencia y puntos de interés",
      "v": "182 comercios · 3,072 POIs", "l": "ODbL · © colaboradores de OpenStreetMap"},
     {"n": "OpenStreetMap", "t": "Red vial caminable",
@@ -84,16 +74,16 @@ def salir(msg):
     sys.exit(1)
 
 
-for f in ("resultado_final.parquet", "features.parquet", "mass_panel.parquet",
-          "resultados_backtesting.csv"):
-    if not os.path.exists(f):
-        salir(f"Falta {f}. Ejecuta primero: python pipeline.py")
+for f in ("resultado_final.parquet", "mass_panel.parquet", "resultados_backtesting.csv",
+          "resultados_cv.csv", "importancia_variables.csv"):
+    if not os.path.exists(f"{RES}/{f}"):
+        salir(f"Falta {RES}/{f}. Ejecuta primero: python pipeline.py")
 
 os.makedirs(DESTINO, exist_ok=True)
 
 # ═══════════════════════ 1. hexes.json ═══════════════════════
 print("[1] hexes.json")
-R = gpd.read_parquet("resultado_final.parquet")
+R = gpd.read_parquet(f"{RES}/resultado_final.parquet")
 R["DIST"] = R["DIST"].fillna("SIN_DATO").astype(str)
 districts = sorted(R["DIST"].unique().tolist())
 idx = {d: i for i, d in enumerate(districts)}
@@ -108,7 +98,7 @@ for r in R.itertuples():
     for c in COLS[2:]:
         v = getattr(r, c)
         v = 0.0 if pd.isna(v) else float(v)
-        fila.append(round(v, 5))
+        fila.append(round(v, DECIMALES.get(c, 0)))
     rows.append(fila)
 
 json.dump({"cols": COLS, "districts": districts, "rows": rows},
@@ -119,7 +109,7 @@ print(f"    {len(rows):,} celdas · {len(COLS)} columnas · "
 
 # ═══════════════════════ 2. mass.json ═══════════════════════
 print("[2] mass.json")
-M = gpd.read_parquet("mass_panel.parquet")
+M = gpd.read_parquet(f"{RES}/mass_panel.parquet")
 M = M.sort_values("anio").drop_duplicates("codigo", keep="first")
 mass = [{"c": str(r.codigo), "d": str(getattr(r, "direccion", "") or ""),
          "dt": str(getattr(r, "distrito", "") or ""),
@@ -144,75 +134,55 @@ print(f"    {len(comp)} comercios")
 
 # ═══════════════════════ 4. meta.json ═══════════════════════
 print("[4] meta.json")
-B = pd.read_csv("resultados_backtesting.csv")
+B = pd.read_csv(f"{RES}/resultados_backtesting.csv")
 backtesting = [{"modelo": r["modelo"], "PR_AUC": round(r["PR_AUC"], 4),
                 "ROC_AUC": round(r["ROC_AUC"], 4), "P@10": round(r["P@10"], 2),
                 "P@20": round(r["P@20"], 2), "P@50": round(r["P@50"], 2),
                 "R@50": round(r["R@50"], 4), "Lift@10%": round(r["Lift@10%"], 4),
                 "acierto@20": int(r["acierto@20"])} for _, r in B.iterrows()]
 
-F = pd.read_parquet("features.parquet")
-PRED = [c for c in F.columns if c not in ("h3", "DIST", "es_nucleo", "bloque")
-        and not c.startswith(("mass_", "d_mass_"))]
-X = F[PRED].replace([np.inf, -np.inf], 0).fillna(0).values
-y = F["mass_2026"].values
-pw = (y == 0).sum() / max((y == 1).sum(), 1)
-
-print("    entrenando Random Forest para importancias...")
-rf = RandomForestClassifier(n_estimators=800, min_samples_leaf=5,
-                            max_features="sqrt", class_weight="balanced_subsample",
-                            n_jobs=-1, random_state=42).fit(X, y)
-imp = pd.Series(rf.feature_importances_, index=PRED).sort_values(ascending=False)
-importancias = [{"v": ETIQUETAS.get(k, k), "i": round(float(v), 4)}
-                for k, v in imp.head(12).items()]
-print("    top 3:", ", ".join(f"{d['v']} {d['i']:.4f}" for d in importancias[:3]))
-
-if RECALCULAR_CV:
-    print("    recalculando validación cruzada espacial (2-3 min)...")
-    F["bloque"] = [h3.cell_to_parent(c, 6) for c in F["h3"]]
-    oof = {k: np.zeros(len(F)) for k in ("LR", "RF", "XGB")}
-    for tr, te in GroupKFold(n_splits=5).split(X, y, groups=F["bloque"]):
-        sc = StandardScaler().fit(X[tr])
-        oof["LR"][te] = LogisticRegression(max_iter=5000, class_weight="balanced", C=0.5)\
-            .fit(sc.transform(X[tr]), y[tr]).predict_proba(sc.transform(X[te]))[:, 1]
-        oof["RF"][te] = RandomForestClassifier(
-            n_estimators=800, min_samples_leaf=5, max_features="sqrt",
-            class_weight="balanced_subsample", n_jobs=-1, random_state=42)\
-            .fit(X[tr], y[tr]).predict_proba(X[te])[:, 1]
-        oof["XGB"][te] = xgb.XGBClassifier(
-            n_estimators=400, max_depth=3, learning_rate=0.05, subsample=0.8,
-            colsample_bytree=0.7, reg_lambda=3.0, min_child_weight=5,
-            scale_pos_weight=pw, eval_metric="aucpr", random_state=42)\
-            .fit(X[tr], y[tr]).predict_proba(X[te])[:, 1]
-    eo = np.mean([pd.Series(v).rank(pct=True) for v in oof.values()], axis=0)
-    nom = {"LR": "Regresión logística", "RF": "Random Forest", "XGB": "XGBoost"}
-    cv = [{"modelo": nom[k], "pr_auc": round(average_precision_score(y, v), 3),
-           "roc_auc": round(roc_auc_score(y, v), 3)} for k, v in oof.items()]
-    cv.append({"modelo": "Ensamble",
-               "pr_auc": round(average_precision_score(y, eo), 3),
-               "roc_auc": round(roc_auc_score(y, eo), 3)})
-else:
-    cv = CV_FIJO
+# Validacion cruzada e importancias: las mismas que calculo pipeline.py
+NOM_CV = {"LR": "Regresión logística", "RF": "Random Forest",
+          "XGB": "XGBoost", "ENS": "Ensamble"}
+cv = [{"modelo": NOM_CV[r["modelo"]], "pr_auc": round(r["PR_AUC"], 3),
+       "roc_auc": round(r["ROC_AUC"], 3)}
+      for _, r in pd.read_csv(f"{RES}/resultados_cv.csv").iterrows()]
 for c in cv:
     print(f"    {c['modelo']:22s} PR-AUC {c['pr_auc']:.3f}  ROC-AUC {c['roc_auc']:.3f}")
+
+I = pd.read_csv(f"{RES}/importancia_variables.csv").head(12)
+importancias = [{"v": ETIQUETAS.get(r.variable, r.variable), "i": round(float(r.importancia), 4)}
+                for r in I.itertuples()]
+print("    top 3:", ", ".join(f"{d['v']} {d['i']:.4f}" for d in importancias[:3]))
 
 aperturas = M["anio_apertura"].value_counts().sort_index().to_dict()
 aperturas = {str(int(k)): int(v) for k, v in aperturas.items()}
 
-G = gpd.read_parquet("grid.parquet")
-G["DIST"] = G["DIST"].fillna("SIN_DATO").astype(str)
-pobd = (G[G["DIST"] != "SIN_DATO"].groupby("DIST")["pob_2017"].sum()
+# Poblacion censal por distrito (total de manzanas por UBIGEO)
+UBIGEOS = {
+    "040101": "AREQUIPA", "040102": "ALTO SELVA ALEGRE", "040103": "CAYMA",
+    "040104": "CERRO COLORADO", "040105": "CHARACATO", "040107": "JACOBO HUNTER",
+    "040109": "MARIANO MELGAR", "040110": "MIRAFLORES", "040112": "PAUCARPATA",
+    "040116": "SABANDIA", "040117": "SACHACA", "040122": "SOCABAYA",
+    "040123": "TIABAYA", "040124": "UCHUMAYO", "040126": "YANAHUARA",
+    "040128": "YURA", "040129": "JLBR",
+}
+mz = gpd.read_file(glob.glob("data/inei/*Manzanas_Poblacion*.dbf")[0], ignore_geometry=True)
+pobd = (mz.groupby(mz["UBIGEO"].map(UBIGEOS))["T_TOTAL"].sum()
         .sort_values(ascending=False))
 poblacion_distrito = [{"d": k, "p": int(round(v))} for k, v in pobd.items()]
 
-json.dump({"backtesting": backtesting, "cv_espacial": cv,
+# Tasa base de la validacion cruzada: celdas con tienda en 2026
+F = pd.read_parquet(f"{RES}/features.parquet", columns=["mass_2026"])
+tasa_base_cv = round(float((F["mass_2026"] > 0).mean()), 4)
+
+json.dump({"backtesting": backtesting, "cv_espacial": cv, "tasa_base_cv": tasa_base_cv,
            "importancias": importancias, "aperturas": aperturas,
            "poblacion_distrito": poblacion_distrito, "fuentes": FUENTES},
           open(f"{DESTINO}/meta.json", "w", encoding="utf-8"),
-          ensure_ascii=False, indent=1)
+          ensure_ascii=False, separators=(",", ":"))
 print(f"    aperturas por año: {aperturas}")
 
 total = sum(os.path.getsize(f"{DESTINO}/{f}") for f in
             ("hexes.json", "mass.json", "competencia.json", "meta.json"))
 print(f"\n=== LISTO === {total/1024:.0f} KB en {DESTINO}")
-print("Recarga la aplicación y verifica que /modelo muestre 3 aciertos y Lift 3.87")

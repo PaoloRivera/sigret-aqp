@@ -28,7 +28,7 @@ const fases = [
   },
   {
     n: '04', t: 'Modelado supervisado',
-    d: 'Regresión logística, Random Forest y XGBoost sobre 36 predictores. Ensamble por promedio de rangos percentiles para normalizar escalas heterogéneas.',
+    d: 'Regresión logística, Random Forest y XGBoost sobre 37 predictores. Ensamble por promedio de rangos percentiles para normalizar escalas heterogéneas.',
     o: '4 modelos comparados',
     ic: 'bx-brain',
   },

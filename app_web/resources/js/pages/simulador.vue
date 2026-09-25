@@ -1,7 +1,7 @@
 <script setup>
 import { useTheme } from 'vuetify'
 import HexMap from '@/views/sigret/HexMap.vue'
-import { useSigret } from '@/stores/sigret'
+import { huff as estimarHuff, useSigret } from '@/stores/sigret'
 
 const store = useSigret()
 const theme = useTheme()
@@ -24,48 +24,17 @@ watch(candidatos, v => {
 const h = computed(() =>
   store.hexesCalculados.find(x => x.h3 === elegido.value) ?? null)
 
-// ── Modelo de interacción espacial de Huff ───────────────────────────────────
-// La probabilidad de elección es proporcional a la atractividad del
-// establecimiento e inversamente proporcional a la fricción de la distancia.
-// Superficies asumidas: bodega tradicional 45 m², hard discount 175 m².
-const M2_BODEGA = 45
-const M2_MASS = 175
-const ALPHA = 1.0
-
-const huff = computed(() => {
-  if (!h.value)
-    return null
-
-  const { superficie, gastoPerCapita, margen, inversion } = store.p
-
-  const aNueva = superficie ** ALPHA
-  const aRival = h.value.n_comp_osm_k1 * M2_BODEGA ** ALPHA
-    + h.value.mass_k1_2026 * M2_MASS ** ALPHA
-
-  const cuota = aNueva + aRival > 0 ? aNueva / (aNueva + aRival) : 1
-  const ventas = h.value.pob_k1 * gastoPerCapita * cuota
-  const bruto = ventas * margen
-  const payback = bruto > 0 ? inversion / bruto : null
-
-  return { cuota, ventas, bruto, payback, aNueva, aRival }
-})
+// Modelo de interacción espacial de Huff (definido en el store)
+const huff = computed(() => h.value ? estimarHuff(h.value, store.p) : null)
 
 // Curva de sensibilidad: cómo varía la cuota con la superficie
 const curva = computed(() => {
   if (!h.value)
     return []
 
-  const aRival = h.value.n_comp_osm_k1 * M2_BODEGA ** ALPHA
-    + h.value.mass_k1_2026 * M2_MASS ** ALPHA
-
   const pts = []
-  for (let m2 = 40; m2 <= 300; m2 += 10) {
-    const cuota = m2 ** ALPHA / (m2 ** ALPHA + aRival)
-    pts.push({
-      x: m2,
-      y: +(h.value.pob_k1 * store.p.gastoPerCapita * cuota * store.p.margen).toFixed(0),
-    })
-  }
+  for (let m2 = 40; m2 <= 300; m2 += 10)
+    pts.push({ x: m2, y: +estimarHuff(h.value, store.p, m2).bruto.toFixed(0) })
 
   return pts
 })
@@ -159,6 +128,11 @@ const alertas = computed(() => {
       txt: `${h.value.n_comp_osm_k1} competidores registrados en el área de captación.`,
     })
   }
+  a.push({
+    t: 'info',
+    txt: `Oferta informal estimada: ${Math.round(huff.value.bodegas)} bodegas `
+      + `(1 cada ${store.p.habPorBodega} habitantes).`,
+  })
   if (h.value.pob_k1 < 2500) {
     a.push({
       t: 'warning',
@@ -333,7 +307,7 @@ const alertas = computed(() => {
                   class="res-val"
                   :class="huff.payback > 36 ? 'text-error' : ''"
                 >
-                  {{ huff.payback ? Math.round(huff.payback) : '—' }}<span>meses</span>
+                  {{ huff.payback ? huff.payback.toFixed(1) : '—' }}<span>meses</span>
                 </div>
               </VCardText>
             </VCard>
@@ -374,7 +348,8 @@ const alertas = computed(() => {
                       ['Distrito', h.dist],
                       ['Población a 500 m', `${nf.format(Math.round(h.pob_k1))} hab`],
                       ['Población a 800 m', `${nf.format(Math.round(h.pob_k2))} hab`],
-                      ['Competidores', h.n_comp_osm_k1],
+                      ['Competidores registrados', h.n_comp_osm_k1],
+                      ['Bodegas estimadas', huff ? huff.bodegas.toFixed(1) : '—'],
                       ['Tiendas Mass a 500 m', h.mass_k1_2026],
                       ['Mass más cercano', `${nf.format(Math.round(h.d_mass_2026))} m`],
                       ['POIs generadores', h.n_poi_k1],

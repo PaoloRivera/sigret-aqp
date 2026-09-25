@@ -103,6 +103,23 @@ const capas = defineModel('capas', {
         </p>
       </div>
 
+      <div class="ctrl mt-4">
+        <div class="ctrl-head">
+          <span class="ctrl-label">Habitantes por bodega</span>
+          <span class="ctrl-val">{{ store.p.habPorBodega }}</span>
+        </div>
+        <VSlider
+          v-model="store.p.habPorBodega"
+          :min="60" :max="400" :step="10"
+          color="info" density="compact" hide-details thumb-size="14"
+          track-size="4"
+        />
+        <p class="ctrl-help">
+          Densidad de oferta informal estimada. OpenStreetMap no registra la
+          mayoría de bodegas; se usa el máximo entre estimadas y registradas.
+        </p>
+      </div>
+
       <template v-if="mostrarFinanzas">
         <VDivider class="my-4" />
         <div class="ctrl-section">Supuestos económicos</div>
