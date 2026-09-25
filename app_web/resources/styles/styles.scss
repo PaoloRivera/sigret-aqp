@@ -1,1 +1,56 @@
-// Write your overrides
+// ─────────────────────────────────────────────────────────────────────────────
+// SIGRET-AQP · Ajustes globales sobre la plantilla
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Botones en tipografía de oración: en español la mayúscula por palabra
+// ("Abrir El Mapa") resulta forzada
+.v-btn {
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+// Tarjetas planas con borde fino: el contenido (mapa, cifras) es el
+// protagonista, no la sombra
+.layout-page-content .v-card {
+  border: 1px solid rgba(var(--v-border-color), 0.08);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(27, 42, 50, 4%), 0 6px 20px -8px rgba(27, 42, 50, 10%);
+}
+
+.v-theme--dark .layout-page-content .v-card {
+  border-color: rgba(255, 255, 255, 6%);
+  box-shadow: none;
+}
+
+// Cifras alineadas en tablas, indicadores y controles
+.v-table td,
+.v-card .text-h4,
+.v-card .text-h5 {
+  font-variant-numeric: tabular-nums;
+}
+
+// Encabezados de página más firmes
+.layout-page-content h1,
+.layout-page-content .text-h4 {
+  letter-spacing: -0.015em;
+}
+
+// Tablas: cabecera discreta y filas con respiro
+.v-table > .v-table__wrapper > table > thead > tr > th {
+  color: rgba(var(--v-theme-on-surface), 0.55) !important;
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+// Atribución del mapa legible sobre el fondo oscuro
+.maplibregl-ctrl-attrib {
+  background: rgba(15, 20, 24, 70%) !important;
+  color: rgba(255, 255, 255, 70%);
+
+  a {
+    color: rgba(255, 255, 255, 85%) !important;
+  }
+}

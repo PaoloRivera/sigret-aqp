@@ -17,13 +17,13 @@ const fases = [
   {
     n: '02', t: 'Red histórica de competencia',
     d: 'Extracción de coordenadas desde los atributos de datos del localizador público y consolidación de snapshots del Internet Archive para reconstruir la serie temporal.',
-    o: '128 tiendas · 4 cortes anuales',
+    o: '127 tiendas · 4 cortes anuales',
     ic: 'bx-time-five',
   },
   {
     n: '03', t: 'Ingeniería de características',
     d: 'Demanda en vecindades concéntricas, morfología de la red vial, nueve categorías de POIs generadores de flujo, competencia e índices de saturación.',
-    o: '51 variables por celda',
+    o: '49 variables por celda',
     ic: 'bx-slider-alt',
   },
   {
@@ -76,14 +76,12 @@ const stack = [
       >
         <VCard class="fuente h-100">
           <VCardText class="pa-5">
-            <div class="d-flex align-start justify-space-between mb-2">
-              <div class="fuente-t">{{ f.n }}</div>
-              <VChip size="x-small" variant="tonal" color="secondary" label>
-                {{ f.l }}
-              </VChip>
-            </div>
+            <div class="fuente-t mb-1">{{ f.n }}</div>
             <div class="fuente-d">{{ f.t }}</div>
             <div class="fuente-v">{{ f.v }}</div>
+            <div class="fuente-l mt-3">
+              <VIcon icon="bx-check-circle" size="14" class="me-1" />{{ f.l }}
+            </div>
           </VCardText>
         </VCard>
       </VCol>
@@ -98,7 +96,7 @@ const stack = [
               Arquitectura del procesamiento
             </VCardTitle>
             <VCardSubtitle class="text-caption">
-              Seis fases reproducibles · aproximadamente 4 minutos de ejecución
+              Seis fases reproducibles · menos de un minuto de ejecución
             </VCardSubtitle>
           </VCardItem>
           <VCardText>
@@ -141,7 +139,7 @@ const stack = [
             <div class="capa">
               <div class="capa-t">Fuera de línea · Python</div>
               <div class="capa-d">Overlay de 21,705 manzanas, entrenamiento con validación cruzada</div>
-              <div class="capa-m">≈ 4 min</div>
+              <div class="capa-m">< 1 min</div>
             </div>
             <div class="capa capa--on">
               <div class="capa-t">En línea · navegador</div>
@@ -225,6 +223,13 @@ const stack = [
 </template>
 
 <style lang="scss" scoped>
+.fuente-l {
+  display: flex;
+  align-items: center;
+  color: rgba(var(--v-theme-on-surface), .5);
+  font-size: 11.5px;
+}
+
 .eyebrow {
   color: rgb(var(--v-theme-primary));
   font-size: 11px;

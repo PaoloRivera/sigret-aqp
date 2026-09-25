@@ -32,6 +32,9 @@ const props = defineProps({
 const store = useSigret()
 const contenedor = ref(null)
 let map = null
+// Se activa cuando el estilo base está listo; isStyleLoaded() devuelve falso
+// mientras quedan teselas por descargar y bloquearía el repintado
+let estiloListo = false
 let popup = null
 
 // OpenFreeMap: teselas vectoriales de OpenStreetMap sin clave de API, sin
@@ -93,7 +96,7 @@ const expresionColor = [
 ]
 
 function pintarCapas() {
-  if (!map || !map.isStyleLoaded())
+  if (!map || !estiloListo)
     return
 
   const gj = construirGeoJSON()
@@ -254,7 +257,17 @@ onMounted(async () => {
   map.addControl(new AttributionControl({ compact: true }), 'bottom-right')
   map.addControl(new ScaleControl({ maxWidth: 110, unit: 'metric' }), 'bottom-left')
 
-  map.on('load', () => {
+  // El estilo base referencia texturas decorativas que no publica; se
+  // sustituyen por una imagen transparente para evitar avisos en consola
+  map.on('styleimagemissing', e => {
+    if (!map.hasImage(e.id))
+      map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) })
+  })
+
+  // Los hexágonos no dependen de las teselas del mapa base: se dibujan en
+  // cuanto el estilo está disponible, sin esperar a que termine de descargarse
+  map.once('style.load', () => {
+    estiloListo = true
     pintarCapas()
     montarInteraccion()
   })
@@ -264,6 +277,7 @@ onBeforeUnmount(() => {
   popup?.remove()
   map?.remove()
   map = null
+  estiloListo = false
 })
 
 watch(() => store.hexesVisibles, () => pintarCapas(), { deep: false })

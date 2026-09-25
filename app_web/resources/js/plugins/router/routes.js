@@ -47,10 +47,6 @@ export const routes = [
     component: () => import('@/layouts/blank.vue'),
     children: [
       {
-        path: 'login',
-        component: () => import('@/pages/login.vue'),
-      },
-      {
         path: '/:pathMatch(.*)*',
         component: () => import('@/pages/[...error].vue'),
       },

@@ -1,34 +1,14 @@
-<script setup>
-import misc404 from '@images/pages/404.png'
-</script>
-
 <template>
-  <div class="misc-wrapper">
-    <ErrorHeader
-      status-code="404"
-      title="Page Not Found ⚠️"
-      description="We couldn't find the page you are looking for."
-    />
-
-    <VBtn
-      to="/"
-      class="mb-6"
-    >
-      Back to Home
+  <div class="d-flex flex-column align-center justify-center text-center" style="min-block-size: 70vh">
+    <VIcon icon="bx-map-pin" size="56" color="primary" class="mb-4" />
+    <h1 class="text-h4 mb-2">
+      Página no encontrada
+    </h1>
+    <p class="text-body-1 text-medium-emphasis mb-6">
+      La dirección que buscas no existe en SIGRET-AQP.
+    </p>
+    <VBtn to="/panel" prepend-icon="bx-bar-chart-alt-2">
+      Ir al resumen
     </VBtn>
-
-    <!-- 👉 Image -->
-    <div class="misc-avatar w-100 text-center">
-      <VImg
-        :src="misc404"
-        alt="Page Not Found"
-        :max-width="500"
-        class="mx-auto"
-      />
-    </div>
   </div>
 </template>
-
-<style lang="scss">
-@use "@core-scss/template/pages/misc.scss";
-</style>

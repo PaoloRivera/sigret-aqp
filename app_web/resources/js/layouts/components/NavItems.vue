@@ -15,7 +15,7 @@ import VerticalNavSectionTitle from '@layouts/components/VerticalNavSectionTitle
   />
   <VerticalNavLink
     :item="{
-      title: 'Mapa de oportunidad',
+      title: 'Mapa',
       icon: 'bx-map-alt',
       to: '/mapa',
     }"
@@ -39,14 +39,14 @@ import VerticalNavSectionTitle from '@layouts/components/VerticalNavSectionTitle
 
   <VerticalNavLink
     :item="{
-      title: 'Validación del modelo',
+      title: 'Validación',
       icon: 'bx-check-shield',
       to: '/modelo',
     }"
   />
   <VerticalNavLink
     :item="{
-      title: 'Fuentes de datos',
+      title: 'Fuentes',
       icon: 'bx-data',
       to: '/fuentes',
     }"

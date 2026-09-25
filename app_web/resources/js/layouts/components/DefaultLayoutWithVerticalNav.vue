@@ -4,7 +4,20 @@ import logo from '@images/logo.svg?raw'
 import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
 import Footer from '@/layouts/components/Footer.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
-import UserProfile from '@/layouts/components/UserProfile.vue'
+import { useSigret } from '@/stores/sigret'
+
+const store = useSigret()
+const route = useRoute()
+
+const seccion = computed(() => route.meta?.titulo ?? '')
+
+const fechaDatos = computed(() => {
+  const f = store.meta?.generado
+  if (!f)
+    return null
+
+  return new Date(`${f}T12:00:00`).toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' })
+})
 </script>
 
 <template>
@@ -20,39 +33,24 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
           <VIcon icon="bx-menu" />
         </IconBtn>
 
-        <!-- 👉 Search -->
-        <div
-          class="d-flex align-center cursor-pointer ms-lg-n3"
-          style="user-select: none;"
-        >
-          <!-- 👉 Search Trigger button -->
-          <IconBtn>
-            <VIcon icon="bx-search" />
-          </IconBtn>
-
-          <span class="d-none d-md-flex align-center text-disabled ms-2">
-            <span class="me-2">Search</span>
-            <span class="meta-key">&#8984;K</span>
-          </span>
+        <div class="navbar-ctx d-flex align-center ms-lg-n2">
+          <span class="navbar-proy">SIGRET-AQP</span>
+          <span v-if="seccion" class="navbar-sep">/</span>
+          <span class="navbar-seccion">{{ seccion }}</span>
         </div>
 
         <VSpacer />
 
-        <IconBtn
-          href="https://github.com/themeselection/sneat-vuetify-vuejs-laravel-admin-template-free"
-          target="_blank"
-          rel="noopener noreferrer"
+        <VChip
+          v-if="fechaDatos"
+          size="small" variant="tonal" color="secondary" label
+          class="me-2 d-none d-sm-flex"
+          prepend-icon="bx-data"
         >
-          <VIcon icon="bxl-github" />
-        </IconBtn>
+          Datos al {{ fechaDatos }}
+        </VChip>
 
-        <IconBtn>
-          <VIcon icon="bx-bell" />
-        </IconBtn>
-
-        <NavbarThemeSwitcher class="me-1" />
-
-        <UserProfile />
+        <NavbarThemeSwitcher />
       </div>
     </template>
 
@@ -97,13 +95,24 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
 </template>
 
 <style lang="scss" scoped>
-.meta-key {
-  border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 6px;
-  block-size: 1.5625rem;
-  line-height: 1.3125rem;
-  padding-block: 0.125rem;
-  padding-inline: 0.25rem;
+.navbar-ctx {
+  gap: 8px;
+  font-size: 0.875rem;
+}
+
+.navbar-proy {
+  color: rgb(var(--v-theme-primary));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.navbar-sep {
+  color: rgba(var(--v-theme-on-surface), 0.3);
+}
+
+.navbar-seccion {
+  color: rgba(var(--v-theme-on-surface), 0.72);
+  font-weight: 500;
 }
 
 .app-brand {
