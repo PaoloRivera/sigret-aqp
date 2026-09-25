@@ -360,7 +360,7 @@ def modelos(F):
     return F
 
 
-def score(F, grid, gasto_mes=180, w_pot=0.45, pen_mass=0.60, radio=800, pob_min=1500):
+def score(F, grid, gasto_mes=180, w_pot=0.344, pen_mass=0.261, radio=750, pob_min=1500):
     print("[5] Score y ranking")
     F["demanda_pot"] = F["pob_k1"] * gasto_mes
     F["oferta_k1"] = F["n_comp_osm_k1"] + F["mass_k1_2026"] * 3
