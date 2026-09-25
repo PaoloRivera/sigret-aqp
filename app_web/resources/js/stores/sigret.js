@@ -11,6 +11,28 @@ import { defineStore } from 'pinia'
 
 const BASE = '/data'
 
+// ── Modelo de interacción espacial de Huff ───────────────────────────────────
+// La cuota es la atractividad propia sobre la atractividad total del área de
+// captación. OpenStreetMap registra muy pocas bodegas, así que la oferta
+// informal se estima por densidad poblacional y se toma el máximo frente al
+// conteo observado, para no contar dos veces el mismo competidor.
+// Superficies asumidas: bodega tradicional 45 m², hard discount 175 m².
+export const M2_BODEGA = 45
+export const M2_MASS = 175
+export const ALPHA = 1.0
+
+export function huff(h, p, superficie = p.superficie) {
+  const bodegas = Math.max(h.n_comp_osm_k1, h.pob_k1 / p.habPorBodega)
+  const aNueva = superficie ** ALPHA
+  const aRival = bodegas * M2_BODEGA ** ALPHA + h.mass_k1_2026 * M2_MASS ** ALPHA
+  const cuota = aNueva + aRival > 0 ? aNueva / (aNueva + aRival) : 1
+  const ventas = h.pob_k1 * p.gastoPerCapita * cuota
+  const bruto = ventas * p.margen
+  const payback = bruto > 0 ? p.inversion / bruto : null
+
+  return { bodegas, cuota, ventas, bruto, payback, aNueva, aRival }
+}
+
 export const useSigret = defineStore('sigret', {
   state: () => ({
     ready: false,
@@ -27,10 +49,11 @@ export const useSigret = defineStore('sigret', {
 
     // Parámetros del modelo de decisión
     p: {
-      wPerfil: 0.45,       // peso del perfil aprendido vs demanda residual
-      penalizacion: 0.60,  // castigo por proximidad de hard discount
-      radioAmenaza: 800,   // alcance en metros de ese castigo
+      wPerfil: 0.344,      // peso del perfil aprendido vs demanda residual (AHP)
+      penalizacion: 0.261, // castigo por proximidad de hard discount (AHP)
+      radioAmenaza: 750,   // alcance en metros de ese castigo (mediana del panel)
       pobMinima: 1500,     // umbral de viabilidad
+      habPorBodega: 120,   // densidad de oferta informal estimada
       gastoPerCapita: 180, // S/ mensuales en canal bodega
       inversion: 160000,   // S/ de inversión inicial
       margen: 0.22,        // margen bruto del canal
@@ -51,14 +74,13 @@ export const useSigret = defineStore('sigret', {
       if (!state.ready)
         return []
 
-      const { wPerfil, penalizacion, radioAmenaza, pobMinima,
-        gastoPerCapita, inversion, margen } = state.p
+      const { wPerfil, penalizacion, radioAmenaza, pobMinima } = state.p
 
       const wDemanda = 1 - wPerfil
 
       return state.hex.map(h => {
         const riesgo = Math.min(Math.max(1 - h.d_mass_2026 / radioAmenaza, 0), 1)
-        const viable = h.pob_k1 >= pobMinima && h.mass_k1_2026 === 0
+        const viable = h.pob_k1 >= pobMinima && h.mass_2026 === 0
 
         let score = 0
         if (viable) {
@@ -66,18 +88,17 @@ export const useSigret = defineStore('sigret', {
             * (1 - penalizacion * riesgo)
         }
 
-        const oferta = 1 + h.n_comp_osm_k1 + 3 * h.mass_k1_2026
-        const captura = h.pob_k1 * gastoPerCapita / oferta
-        const margenMes = captura * margen
+        const e = huff(h, state.p)
 
         return {
           ...h,
           riesgo,
           viable,
           score,
-          captura,
-          margenMes,
-          payback: margenMes > 0 ? inversion / margenMes : null,
+          bodegas: e.bodegas,
+          captura: e.ventas,
+          margenMes: e.bruto,
+          payback: e.payback,
         }
       })
     },
@@ -102,6 +123,10 @@ export const useSigret = defineStore('sigret', {
       const todos = this.hexesCalculados
       const viables = todos.filter(h => h.viable)
       const pob = todos.reduce((s, h) => s + h.pob_2017, 0)
+      const cv = state.meta?.cv_espacial ?? []
+      const ens = (state.meta?.backtesting ?? []).find(r => r.modelo.startsWith('Ensamble'))
+      const tasaBaseCv = state.meta?.tasa_base_cv ?? 0
+      const prAuc = cv.find(r => r.modelo === 'Ensamble')?.pr_auc ?? 0
 
       return {
         hexagonos: todos.length,
@@ -109,8 +134,12 @@ export const useSigret = defineStore('sigret', {
         poblacion: pob,
         competencia: state.mass.length + state.competencia.length,
         distritos: state.districts.length,
-        rocAuc: 0.929,
-        prAuc: 0.249,
+        rocAuc: Math.max(0, ...cv.map(r => r.roc_auc)),
+        prAuc,
+        tasaBaseCv,
+        prSobreBase: tasaBaseCv ? prAuc / tasaBaseCv : 0,
+        aciertos20: ens?.['acierto@20'] ?? 0,
+        lift: ens?.['Lift@10%'] ?? 0,
       }
     },
 
@@ -185,10 +214,11 @@ export const useSigret = defineStore('sigret', {
 
     reset() {
       this.p = {
-        wPerfil: 0.45,
-        penalizacion: 0.60,
-        radioAmenaza: 800,
+        wPerfil: 0.344,
+        penalizacion: 0.261,
+        radioAmenaza: 750,
         pobMinima: 1500,
+        habPorBodega: 120,
         gastoPerCapita: 180,
         inversion: 160000,
         margen: 0.22,

@@ -63,7 +63,7 @@ const dispersion = computed(() => {
     if (!porDist[h.dist])
       porDist[h.dist] = { pob: 0, mass: 0 }
     porDist[h.dist].pob += h.pob_2017
-    porDist[h.dist].mass += h.mass_k1_2026 > 0 ? 1 : 0
+    porDist[h.dist].mass += h.mass_2026
   })
 
   return [{
@@ -208,7 +208,7 @@ const apertOpts = computed(() => ({
         <KpiTile
           label="PR-AUC" :value="kpis.prAuc.toFixed(3)"
           icon="bx-line-chart" color="primary"
-          hint="7.5× sobre la tasa base"
+          :hint="`${kpis.prSobreBase.toFixed(1)}× sobre la tasa base`"
         />
       </VCol>
     </VRow>
@@ -227,18 +227,18 @@ const apertOpts = computed(() => ({
               corredores viales principales. Al penalizar la cercanía de un
               hard discount —contra el que un independiente no puede competir en
               precio— la prioridad se desplaza hacia la periferia densa:
-              <strong>Jacobo Hunter</strong>, <strong>Socabaya</strong>,
-              <strong>Cerro Colorado</strong> y <strong>Miraflores</strong>
-              concentran 34 de las 50 mejores ubicaciones.
+              <strong>Jacobo Hunter</strong>, <strong>Miraflores</strong>,
+              <strong>Socabaya</strong> y <strong>Cerro Colorado</strong>
+              concentran 32 de las 50 mejores ubicaciones.
             </p>
 
             <div class="d-flex flex-wrap gap-6">
               <div class="stat-inline">
-                <span class="stat-num">5</span>
+                <span class="stat-num">{{ kpis.aciertos20 }}</span>
                 <span class="stat-lbl">de 39 aperturas reales<br>acertadas en el Top-20</span>
               </div>
               <div class="stat-inline">
-                <span class="stat-num">4.1×</span>
+                <span class="stat-num">{{ kpis.lift.toFixed(1) }}×</span>
                 <span class="stat-lbl">Lift en el decil<br>superior del ranking</span>
               </div>
               <div class="stat-inline">
