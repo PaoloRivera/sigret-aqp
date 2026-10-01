@@ -227,9 +227,9 @@ const apertOpts = computed(() => ({
               corredores viales principales. Al penalizar la cercanía de un
               hard discount —contra el que un independiente no puede competir en
               precio— la prioridad se desplaza hacia la periferia densa:
-              <strong>Jacobo Hunter</strong>, <strong>Miraflores</strong>,
+              <strong>Miraflores</strong>, <strong>Jacobo Hunter</strong>,
               <strong>Socabaya</strong> y <strong>Cerro Colorado</strong>
-              concentran 32 de las 50 mejores ubicaciones.
+              concentran 33 de las 50 mejores ubicaciones.
             </p>
 
             <div class="d-flex flex-wrap gap-6">

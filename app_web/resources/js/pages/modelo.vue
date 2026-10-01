@@ -337,8 +337,8 @@ const limitaciones = [
               <VIcon icon="bx-right-arrow-alt" size="20" class="ad-flecha" />
               <div class="ad-col">
                 <div class="ad-lbl">Después</div>
-                <div class="ad-val ad-val--bien">0.109</div>
-                <div class="ad-sub">PR-AUC · 3 aciertos</div>
+                <div class="ad-val ad-val--bien">0.117</div>
+                <div class="ad-sub">PR-AUC · 4 aciertos</div>
               </div>
             </div>
 

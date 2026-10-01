@@ -28,8 +28,8 @@ Los modelos de localización comercial de la literatura internacional requieren 
 | Métrica | Valor |
 |---|---|
 | Validación cruzada espacial (5 particiones, 52 bloques H3 r6) | **ROC-AUC 0,929** (Random Forest) · PR-AUC 0,255 (ensamble) |
-| Backtesting temporal (1 259 candidatos, 39 aperturas reales) | **Lift@10 % 3,87** · PR-AUC 0,109 |
-| Mejora sobre el mejor criterio univariado | +25,0 % en lift · +18,3 % en PR-AUC |
+| Backtesting temporal (1 259 candidatos, 39 aperturas reales, predictores al corte de 2024) | **Lift@10 % 4,91** [IC 95 %: 3,02–6,22] · PR-AUC 0,117 |
+| Mejora sobre el mejor criterio univariado | +58,3 % en lift · +27,1 % en PR-AUC (IC 95 % de la diferencia incluye 0) |
 | Usabilidad con usuarios (SUS, n = 15) | 77,83 |
 | Aceptación tecnológica (TAM, n = 15) | 4,13 / 5 |
 | Consistencia del panel de expertos (AHP, n = 10) | CR 0,052 |
@@ -42,10 +42,10 @@ La primera versión del modelo incluía entre sus predictores variables derivada
 
 | | Antes | Después |
 |---|---|---|
-| PR-AUC (backtesting) | 0,045 | 0,109 |
-| ROC-AUC (backtesting) | 0,676 | 0,793 |
-| Aciertos en Top-20 | 1 / 20 | 3 / 20 |
-| Variable más importante | `mass_k1_2024` (0,4959) | `pob_2017` (0,1615) |
+| PR-AUC (backtesting) | 0,045 | 0,117 |
+| ROC-AUC (backtesting) | 0,676 | 0,809 |
+| Aciertos en Top-20 | 1 / 20 | 4 / 20 |
+| Variable más importante | `mass_k1_2024` (0,4959) | `pob_2017` (0,1625) |
 
 La exclusión de esas variables está verificada automáticamente por `verificar_integridad.py`.
 
