@@ -15,7 +15,7 @@ Procedencia, licencia y volumen de cada fuente empleada por el pipeline.
 | `osm/lugares.parquet` | Urbanizaciones, asentamientos y barrios con nombre | Overpass API | ODbL |
 | `mass/mass_ubicame.html` | Snapshot actual del localizador de tiendas | Sitio web público | Público |
 | `mass/wayback/*.html` | Snapshots anuales del mismo localizador (2023–2026) | Internet Archive | Público |
-| `sunat/sunat_bodegas_arequipa.csv` | Establecimientos de abarrotes filtrados del padrón | SUNAT, datos abiertos | Datos abiertos |
+| `sunat/sunat_bodegas_arequipa.csv` | 212 bodegas identificables en el padrón (evaluado; no se usa como predictor) | SUNAT, datos abiertos | Datos abiertos |
 
 > **Atribución obligatoria.** Los archivos de la carpeta `osm/` derivan de OpenStreetMap y deben acreditarse como *© colaboradores de OpenStreetMap*, conforme exige la Open Database License.
 
