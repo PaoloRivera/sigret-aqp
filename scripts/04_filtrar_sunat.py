@@ -27,12 +27,32 @@ UBIGEOS = {
     "040129": "JOSE LUIS BUSTAMANTE Y RIVERO",
 }
 
+# Giro de bodega o minimarket en la razon social. "COMERCIAL" y "DISTRIBUIDORA"
+# no se usan: la primera aparece en la forma legal ("SOCIEDAD COMERCIAL DE
+# RESPONSABILIDAD LIMITADA") y la segunda corresponde al comercio mayorista.
 PATRON_BODEGA = (
     r"\bMINIMARKET|\bMINI\s*MARKET\b|\bMINIMARQUET|\bMINISUPER|"
     r"\bBODEGA|\bBODEGUITA\b|\bABARROTE|\bMARKET\b|\bMARKE\b|"
     r"\bAUTOSERVICIO\b|\bSUPERMERCADO\b|\bMERCADITO\b|\bDESPENSA\b|"
-    r"\bTIENDA\b|\bCOMERCIAL\b|\bDISTRIBUIDORA\b"
+    r"\bTIENDA\b"
 )
+
+# Formas legales que se eliminan de la razon social antes de buscar el giro
+FORMAS_LEGALES = (
+    r"SOCIEDAD COMERCIAL DE RESPONSABILIDAD LIMITADA|SOCIEDAD ANONIMA CERRADA|"
+    r"SOCIEDAD ANONIMA ABIERTA|SOCIEDAD ANONIMA|"
+    r"EMPRESA INDIVIDUAL DE RESPONSABILIDAD LIMITADA"
+)
+
+# Patron de la primera version, conservado para documentar la incidencia E3
+PATRON_INICIAL = PATRON_BODEGA + r"|\bCOMERCIAL\b|\bDISTRIBUIDORA\b"
+
+
+def es_bodega(razon_social):
+    """Marca como bodega la razon social cuyo giro, sin la forma legal, lo indica."""
+    giro = razon_social.fillna("").astype(str).str.upper() \
+        .str.replace(FORMAS_LEGALES, " ", regex=True)
+    return giro.str.contains(PATRON_BODEGA, regex=True)
 
 
 def sin_tildes(s):
@@ -181,8 +201,10 @@ def main():
 
     todo.to_csv("out/sunat_universo_arequipa.csv", index=False, encoding="utf-8-sig")
 
-    bod = todo[todo["RAZON_SOCIAL"].str.contains(PATRON_BODEGA, regex=True, na=False)].copy()
+    inicial = todo["RAZON_SOCIAL"].str.contains(PATRON_INICIAL, regex=True, na=False).sum()
+    bod = todo[es_bodega(todo["RAZON_SOCIAL"])].copy()
     bod.to_csv("out/sunat_bodegas_arequipa.csv", index=False, encoding="utf-8-sig")
+    print(f"[+] Patron inicial (con COMERCIAL en la forma legal): {inicial:,} registros")
 
     print("\n=== LISTO ===")
     print(f"  Universo comercial activo : {len(todo):,}  -> sunat_universo_arequipa.csv")
