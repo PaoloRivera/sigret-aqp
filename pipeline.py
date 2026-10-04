@@ -10,6 +10,7 @@ los modelos de prediccion y calcula el score y el ranking final de ubicaciones.
 import glob
 import os
 import re
+import warnings
 
 import geopandas as gpd
 import h3
@@ -26,6 +27,9 @@ from sklearn.model_selection import GroupKFold
 from sklearn.preprocessing import StandardScaler
 
 np.random.seed(42)
+# Avisos numericos internos de scikit-learn (desbordes en productos matriciales
+# de la regresion logistica) que no alteran los resultados
+warnings.filterwarnings("ignore", category=RuntimeWarning, module="sklearn")
 DATA = "data"
 OUT = "resultados"
 UTM = 32719
