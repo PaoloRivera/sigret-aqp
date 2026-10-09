@@ -243,7 +243,7 @@ const apertOpts = computed(() => ({
               </div>
               <div class="stat-inline">
                 <span class="stat-num">S/ 0</span>
-                <span class="stat-lbl">en licencias, datos<br>y trabajo de campo</span>
+                <span class="stat-lbl">en licencias<br>y compra de datos</span>
               </div>
             </div>
 

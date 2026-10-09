@@ -139,7 +139,7 @@ export const useSigret = defineStore('sigret', {
         poblacion: pob,
         competencia: state.mass.length + state.competencia.length,
         distritos: state.districts.length,
-        rocAuc: Math.max(0, ...cv.map(r => r.roc_auc)),
+        rocAuc: cv.find(r => r.modelo === 'Ensamble')?.roc_auc ?? 0,
         prAuc,
         tasaBaseCv,
         prSobreBase: tasaBaseCv ? prAuc / tasaBaseCv : 0,

@@ -27,14 +27,16 @@ Los modelos de localización comercial de la literatura internacional requieren 
 
 | Métrica | Valor |
 |---|---|
-| Validación cruzada espacial (5 particiones, 52 bloques H3 r6) | **ROC-AUC 0,929** (Random Forest) · PR-AUC 0,255 (ensamble) |
+| Validación cruzada espacial (5 particiones, 52 bloques H3 r6; 3 717 celdas) | **ROC-AUC 0,917** (ensamble; 0,929 en Random Forest, el mejor modelo individual) · PR-AUC 0,255 (ensamble) |
+| Validación cruzada espacial, solo celdas viables (1 341 celdas, 121 positivas) | ROC-AUC 0,766 (ensamble) · 0,793 (Random Forest) · PR-AUC 0,262 (ensamble) |
 | Backtesting temporal (1 259 candidatos, 39 aperturas reales, predictores al corte de 2024) | **Lift@10 % 4,91** [IC 95 %: 3,02–6,22] · PR-AUC 0,117 |
+| Robustez del backtesting, 10 semillas de Random Forest y XGBoost (100 a 109) | Lift@10 % del ensamble 4,29 ± 0,22 (rango 3,87–4,65) · ROC-AUC 0,808 ± 0,002; la semilla 42 del pipeline (4,91) es el extremo alto |
 | Mejora sobre el mejor criterio univariado | +58,3 % en lift · +27,1 % en PR-AUC (IC 95 % de la diferencia incluye 0) |
 | Usabilidad con usuarios (SUS, n = 15) | 77,83 |
 | Aceptación tecnológica (TAM, n = 15) | 4,13 / 5 |
 | Consistencia del panel de expertos (AHP, n = 10) | CR 0,052 |
 
-**Costo de construcción:** S/ 0 en licencias · S/ 0 en compra de datos · 0 horas de trabajo de campo · ningún convenio institucional.
+**Costo de construcción:** S/ 0 en licencias · S/ 0 en compra de datos · sin trabajo de campo para construir el modelo (la evaluación con usuarios sí involucró a 15 participantes y a un panel AHP de 10 propietarios) · ningún convenio institucional.
 
 ## Corrección metodológica documentada
 
