@@ -217,7 +217,7 @@ const limitaciones = [
               un PR-AUC de {{ store.kpis.prAuc.toFixed(3) }} equivale a
               <strong>{{ store.kpis.prSobreBase.toFixed(1) }} veces</strong> el desempeño de una asignación
               aleatoria en la región de alta precisión, que es la única
-              relevante cuando se evalúan 20 ubicaciones y no 3,717.
+              relevante cuando se evalúan 20 ubicaciones y no 3 717.
             </p>
           </VCardText>
         </VCard>

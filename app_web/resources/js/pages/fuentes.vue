@@ -10,14 +10,14 @@ const nf = new Intl.NumberFormat('es-PE')
 const fases = [
   {
     n: '01', t: 'Construcción de la malla',
-    d: 'Relleno de polígono, centroides y vértices de las 21,705 manzanas censales, más un anillo de expansión k=1. La población se transfiere por ponderación areal con 0 % de pérdida.',
-    o: '3,717 hexágonos H3 r9',
+    d: 'Relleno de polígono, centroides y vértices de las 21 705 manzanas censales, más un anillo de expansión k=1. La población se transfiere por ponderación areal con 0 % de pérdida.',
+    o: '3 717 hexágonos H3 r9',
     ic: 'bx-grid-alt',
   },
   {
     n: '02', t: 'Red histórica de competencia',
     d: 'Extracción de coordenadas desde los atributos de datos del localizador público y consolidación de snapshots del Internet Archive para reconstruir la serie temporal.',
-    o: '127 tiendas · 4 cortes anuales',
+    o: '127 tiendas · 4 cortes (2024-2026)',
     ic: 'bx-time-five',
   },
   {
@@ -35,7 +35,7 @@ const fases = [
   {
     n: '05', t: 'Validación',
     d: 'Validación cruzada espacial en bloques H3 r6 y backtesting temporal contra aperturas no vistas durante el entrenamiento.',
-    o: 'ROC-AUC 0.929',
+    o: 'ROC-AUC 0.917',
     ic: 'bx-check-shield',
   },
   {
@@ -63,8 +63,7 @@ const stack = [
       <h1 class="page-title">Fuentes de datos</h1>
       <p class="page-sub">
         Todo el sistema se construyó con información de acceso público y
-        software libre: sin licencias, sin compra de datos y sin trabajo de
-        campo
+        software libre: sin licencias ni compra de datos
       </p>
     </div>
 
@@ -138,12 +137,12 @@ const stack = [
             </p>
             <div class="capa">
               <div class="capa-t">Fuera de línea · Python</div>
-              <div class="capa-d">Overlay de 21,705 manzanas, entrenamiento con validación cruzada</div>
+              <div class="capa-d">Overlay de 21 705 manzanas, entrenamiento con validación cruzada</div>
               <div class="capa-m">< 1 min</div>
             </div>
             <div class="capa capa--on">
               <div class="capa-t">En línea · navegador</div>
-              <div class="capa-d">Recálculo del score sobre 3,717 celdas al mover un control</div>
+              <div class="capa-d">Recálculo del score sobre 3 717 celdas al mover un control</div>
               <div class="capa-m">&lt; 10 ms</div>
             </div>
             <p class="nota mt-3">
