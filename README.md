@@ -3,7 +3,11 @@
 **Sistema de soporte a la decisión basado en analítica geoespacial y aprendizaje automático para la localización de minimarkets independientes en Arequipa Metropolitana**
 
 Tesis de Ingeniería de Sistemas · Universidad Católica de Santa María · 2026
-Autores: Fernando Gabriel Casapia Loayza, Paolo Marcelo Rivera Salas
+Autores: Fernando Gabriel Casapia Loayza, Paolo Marcelo Rivera Salas · Asesora: Karina Rosas Paredes
+
+![Vistas de la aplicación: resumen, mapa de oportunidad, ranking y simulador](docs/capturas/app_cuatro_vistas.png)
+
+**Artículo con los resultados:** [`paper/main.pdf`](paper/main.pdf) (fuente LaTeX en [`paper/main.tex`](paper/main.tex); compilar con `tectonic main.tex`).
 
 ---
 
