@@ -144,7 +144,7 @@ const apertOpts = computed(() => ({
         </h1>
         <p class="page-sub">
           Arequipa Metropolitana · malla H3 resolución 9 · Censo INEI 2017 ·
-          OpenStreetMap · SUNAT
+          OpenStreetMap · Internet Archive
         </p>
       </div>
 
