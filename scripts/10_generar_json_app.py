@@ -56,9 +56,9 @@ ETIQUETAS = {
 
 FUENTES = [
     {"n": "Censo Nacional INEI 2017", "t": "Manzanas con población",
-     "v": "21,705 manzanas · 1,018,031 hab", "l": "Cartografía censal · uso público"},
+     "v": "21 705 manzanas · 1 018 031 hab", "l": "Cartografía censal · uso público"},
     {"n": "OpenStreetMap", "t": "Competencia y puntos de interés",
-     "v": "182 comercios · 3,072 POIs", "l": "ODbL · © colaboradores de OpenStreetMap"},
+     "v": "182 comercios · 3 072 POIs", "l": "ODbL · © colaboradores de OpenStreetMap"},
     {"n": "OpenStreetMap", "t": "Red vial caminable",
      "v": "Nodos y aristas", "l": "ODbL · © colaboradores de OpenStreetMap"},
     {"n": "Localizador público de la cadena", "t": "Red de retail moderno",

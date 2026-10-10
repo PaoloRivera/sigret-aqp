@@ -146,7 +146,7 @@ const stack = [
               <div class="capa-m">&lt; 10 ms</div>
             </div>
             <p class="nota mt-3">
-              Los datos servidos pesan 555 KB. La aplicación funciona sin
+              Los datos servidos pesan 569 KB. La aplicación funciona sin
               backend de cálculo.
             </p>
           </VCardText>
