@@ -1,0 +1,73 @@
+objetivo,conjunto,familia,importancia
+Farmacias,completo,Competencia,0.11221752028493373
+Farmacias,completo,Demanda poblacional,0.4085717081421543
+Farmacias,completo,Morfología vial,0.15473951440966172
+Farmacias,completo,Puntos de interés,0.3244712571632502
+Farmacias,estructural,Competencia,0.1967136607206074
+Farmacias,estructural,Demanda poblacional,0.602131843716802
+Farmacias,estructural,Morfología vial,0.20115449556259074
+Farmacias,demografico_vial,Demanda poblacional,0.7160135061015432
+Farmacias,demografico_vial,Morfología vial,0.28398649389845676
+Grifos,completo,Competencia,0.04790785159543007
+Grifos,completo,Demanda poblacional,0.3961986471065169
+Grifos,completo,Morfología vial,0.3990759624833648
+Grifos,completo,Puntos de interés,0.1568175388146883
+Grifos,estructural,Competencia,0.05280953365055793
+Grifos,estructural,Demanda poblacional,0.4768850089841606
+Grifos,estructural,Morfología vial,0.4703054573652815
+Grifos,demografico_vial,Demanda poblacional,0.5109351205844395
+Grifos,demografico_vial,Morfología vial,0.4890648794155606
+Bancos y cajeros,completo,Competencia,0.07679782737314828
+Bancos y cajeros,completo,Demanda poblacional,0.371842153947587
+Bancos y cajeros,completo,Morfología vial,0.18630986467755783
+Bancos y cajeros,completo,Puntos de interés,0.3650501540017068
+Bancos y cajeros,estructural,Competencia,0.14414383056543156
+Bancos y cajeros,estructural,Demanda poblacional,0.5917098096415069
+Bancos y cajeros,estructural,Morfología vial,0.2641463597930616
+Bancos y cajeros,demografico_vial,Demanda poblacional,0.6939830118514488
+Bancos y cajeros,demografico_vial,Morfología vial,0.30601698814855116
+Colegios,completo,Competencia,0.058845168911088354
+Colegios,completo,Demanda poblacional,0.6898965413516417
+Colegios,completo,Morfología vial,0.20013552384374733
+Colegios,completo,Puntos de interés,0.05112276589352267
+Colegios,estructural,Competencia,0.05429196825726995
+Colegios,estructural,Demanda poblacional,0.773719198609353
+Colegios,estructural,Morfología vial,0.171988833133377
+Colegios,demografico_vial,Demanda poblacional,0.7977917902005929
+Colegios,demografico_vial,Morfología vial,0.2022082097994071
+Restaurantes,completo,Competencia,0.06216866860188512
+Restaurantes,completo,Demanda poblacional,0.48836582270469236
+Restaurantes,completo,Morfología vial,0.25382696459562704
+Restaurantes,completo,Puntos de interés,0.1956385440977956
+Restaurantes,estructural,Competencia,0.08993551753100519
+Restaurantes,estructural,Demanda poblacional,0.6295010454466764
+Restaurantes,estructural,Morfología vial,0.2805634370223185
+Restaurantes,demografico_vial,Demanda poblacional,0.6864262168023925
+Restaurantes,demografico_vial,Morfología vial,0.3135737831976075
+Clínicas y hospitales,completo,Competencia,0.03118043524107286
+Clínicas y hospitales,completo,Demanda poblacional,0.5550261209108395
+Clínicas y hospitales,completo,Morfología vial,0.20941760393014536
+Clínicas y hospitales,completo,Puntos de interés,0.20437583991794245
+Clínicas y hospitales,estructural,Competencia,0.03667004654327011
+Clínicas y hospitales,estructural,Demanda poblacional,0.7216092067596009
+Clínicas y hospitales,estructural,Morfología vial,0.24172074669712892
+Clínicas y hospitales,demografico_vial,Demanda poblacional,0.7290841449160952
+Clínicas y hospitales,demografico_vial,Morfología vial,0.27091585508390476
+Mercados,completo,Competencia,0.036723691905881164
+Mercados,completo,Demanda poblacional,0.4982932722858766
+Mercados,completo,Morfología vial,0.26762570233603666
+Mercados,completo,Puntos de interés,0.1973573334722056
+Mercados,estructural,Competencia,0.04982112014536176
+Mercados,estructural,Demanda poblacional,0.6405649654242714
+Mercados,estructural,Morfología vial,0.30961391443036684
+Mercados,demografico_vial,Demanda poblacional,0.664674605127347
+Mercados,demografico_vial,Morfología vial,0.33532539487265306
+Minimarket (cadena),completo,Competencia,0.03572806044025363
+Minimarket (cadena),completo,Demanda poblacional,0.6430081408514043
+Minimarket (cadena),completo,Morfología vial,0.1997727112295118
+Minimarket (cadena),completo,Puntos de interés,0.12149108747883029
+Minimarket (cadena),estructural,Competencia,0.041638964317422124
+Minimarket (cadena),estructural,Demanda poblacional,0.7536308250354541
+Minimarket (cadena),estructural,Morfología vial,0.20473021064712388
+Minimarket (cadena),demografico_vial,Demanda poblacional,0.7647969083121386
+Minimarket (cadena),demografico_vial,Morfología vial,0.23520309168786135
