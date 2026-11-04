@@ -7,6 +7,10 @@ Procedencia, licencia y volumen de cada fuente empleada por el pipeline.
 | Carpeta | Contenido | Origen | Licencia |
 |---|---|---|---|
 | `inei/` | Manzanas censales con población, Censo Nacional 2017 | INEI, distribución GEO GPS Perú | Uso público |
+| `inei/poblacion_censada_distritos.csv` | Población censada 2017 y 2025 de los 17 distritos | INEI (2018) e INEI (2026) | Uso público |
+| `inei/limites_distritales_aqp.geojson` | Límites de los 17 distritos (ubigeo INEI) | INEI, versión simplificada de juaneladio/peru-geojson | Uso público |
+| `edificaciones/ob_temporal_aqp_50m.tif` | Edificaciones detectadas 2017 y 2023 (número, superficie y volumen; 50 m) | Google Open Buildings 2.5D Temporal (Sirko et al., 2023), exportado con `exportar_open_buildings.js` | CC BY 4.0 u ODbL |
+| `edificaciones/edificaciones_h3.csv` | Resumen de la capa anterior por celda H3 r9 | Generado por `poblacion_actualizada.py` | — |
 | `osm/competencia.parquet` | 182 comercios de abarrotes y conveniencia | Overpass API | ODbL |
 | `osm/poi_flujo.parquet` | 3 072 puntos de interés generadores de flujo | Overpass API | ODbL |
 | `osm/red_nodes.parquet` | Nodos de la red vial caminable | OSMnx | ODbL |
@@ -16,6 +20,9 @@ Procedencia, licencia y volumen de cada fuente empleada por el pipeline.
 | `mass/mass_ubicame.html` | Snapshot actual del localizador de tiendas | Sitio web público | Público |
 | `mass/wayback/*.html` | Snapshots anuales del mismo localizador (2023–2026) | Internet Archive | Público |
 | `sunat/sunat_bodegas_arequipa.csv` | 212 bodegas identificables en el padrón (evaluado; no se usa como predictor) | SUNAT, datos abiertos | Datos abiertos |
+| `campo/muestra_campo.csv`, `.geojson`, `.kml` | Muestra del conteo de campo: 36 celdas y 12 reservas en seis estratos | Generado por `scripts/14_muestra_campo.py` (semilla 42) | — |
+| `campo/plan_jornadas.csv`, `campo/precision_esperada.csv` | Orden sugerido de visita y precisión esperada de h con esta muestra | `scripts/14_muestra_campo.py` | — |
+| `campo/formulario_kobo.xlsx` | Formulario XLSForm del conteo para KoboToolbox | `scripts/14_muestra_campo.py` | — |
 
 > **Atribución obligatoria.** Los archivos de la carpeta `osm/` derivan de OpenStreetMap y deben acreditarse como *© colaboradores de OpenStreetMap*, conforme exige la Open Database License.
 
@@ -32,6 +39,14 @@ Para regenerarlo:
 3. Ejecutar `python scripts/04_filtrar_sunat.py`.
 
 Este archivo se emplea únicamente como indicador de densidad de actividad económica formal por zona y **no es indispensable** para reproducir las métricas principales del modelo.
+
+### Exportación del conteo de campo
+
+La exportación de KoboToolbox y las fotos van en `data/campo/kobo/`, que no se
+publica: ubican bodegas que funcionan en viviendas. Los conteos por celda que
+salen de ella están en `resultados/campo/conteo_por_celda.csv` y bastan para
+reproducir la calibración (`scripts/15_calibrar_bodegas.py --conteos`). El
+procedimiento está en `docs/campo/protocolo_campo.md`.
 
 ## Sobre los snapshots del Internet Archive
 

@@ -98,8 +98,20 @@ def metricas(t, s):
 
 y24 = F["mass_2024"].values
 abrio = ((F["mass_2026"] == 1) & (F["mass_2024"] == 0)).astype(int).values
-cand = (F["pob_k1"] >= 1500).values & (y24 == 0)
+# Candidatos del backtesting: viables con la poblacion al corte (31-12-2024)
+cand = (F24["pob_k1"] >= 1500).values & (y24 == 0)
 t = abrio[cand]
+
+# Variables de poblacion: en los escenarios de fuga se usa siempre la poblacion
+# al corte, para aislar el efecto de las capas OSM
+POB = ["pob_celda", "dens_hab_km2", "pob_k1", "pob_k2", "pob_k3", "pob_k1_ext"]
+
+
+def con_poblacion_corte(P):
+    P = P.copy()
+    P[POB] = F24[POB].values
+    P["hab_por_comp_k1"] = P["pob_k1"] / (P["n_comp_osm_k1"] + 1)
+    return P
 
 
 def backtesting(P):
@@ -152,8 +164,8 @@ G["n_comp_osm_k1"] = [sum(d.get(v, 0) for v in h3.grid_disk(c, 1)) for c in G["h
 G["hab_por_comp_k1"] = G["pob_k1"] / (G["n_comp_osm_k1"] + 1)
 G = G[F.columns]
 
-escenarios = {"OSM 2026 sin filtrar la cadena": G,
-              "OSM 2026 sin locales de la cadena": F,
+escenarios = {"OSM 2026 sin filtrar la cadena": con_poblacion_corte(G),
+              "OSM 2026 sin locales de la cadena": con_poblacion_corte(F),
               "OSM al 31-12-2024 sin locales de la cadena (oficial)": F24}
 filas, scores_oficial = [], None
 for nombre, P in escenarios.items():
@@ -221,7 +233,7 @@ filas = []
 for nombre, z in (("Variable objetivo (tienda de la cadena en 2026)", y26),
                   ("Residuos RF, validacion aleatoria", y26 - oof_rand["RF"]),
                   ("Residuos RF, validacion espacial en bloques", y26 - oof["RF"]),
-                  ("Poblacion de la celda", F["pob_2017"].values)):
+                  ("Poblacion de la celda", F["pob_celda"].values)):
     mi = esda.Moran(z.astype(float), Wm, permutations=999)
     filas.append({"variable": nombre, "I_Moran": mi.I, "p_valor": mi.p_sim, "z": mi.z_sim})
 MO = pd.DataFrame(filas)
@@ -241,7 +253,7 @@ print("\n[5] Multicolinealidad (VIF, statsmodels)")
 Z = StandardScaler().fit_transform(matriz(F))
 Zc = np.c_[np.ones(len(Z)), Z]
 # n_poi_k1 es la suma exacta de las nueve categorias del anillo y pob_k1_ext =
-# pob_k1 - pob_2017: identidades por construccion con VIF infinito. Se reporta
+# pob_k1 - pob_celda: identidades por construccion con VIF infinito. Se reporta
 # ademas el VIF sin esas dos variables.
 IDENT = ["n_poi_k1", "pob_k1_ext"]
 red = [c for c in PRED if c not in IDENT]
@@ -288,7 +300,7 @@ print("\n[7] Tasa de entrada de la cadena junto a las celdas mejor puntuadas en 
 p24 = rango(scores_oficial["Ensamble"])
 dem_n = (F24["pob_k1"] * 180 / (1 + F24["n_comp_osm_k1"] + 3 * F["mass_k1_2024"])).rank(pct=True).values
 riesgo = np.clip(1 - F["d_mass_2024"] / RADIO, 0, 1).values
-viable24 = ((F["pob_k1"] >= 1500) & (F["mass_2024"] == 0)).values
+viable24 = ((F24["pob_k1"] >= 1500) & (F["mass_2024"] == 0)).values
 score24 = np.where(viable24, (W_POT * p24 + (1 - W_POT) * dem_n) * (1 - PEN_MASS * riesgo), 0)
 panel = mass.drop_duplicates("codigo")
 nuevas = panel[panel["anio_apertura"] >= 2025].to_crs(UTM)

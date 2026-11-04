@@ -16,8 +16,12 @@ const BASE = '/data'
 // captación. OpenStreetMap registra muy pocas bodegas, así que la oferta
 // informal se estima por densidad poblacional y se toma el máximo frente al
 // conteo observado, para no contar dos veces el mismo competidor.
+// Si existe el conteo de campo (scripts/15_calibrar_bodegas.py, Anexo K), cada
+// celda trae bod_k1, las bodegas de su área de captación con la ecuación 1
+// calibrada, y meta.campo.h, el valor de h equivalente; el control "Habitantes
+// por bodega" arranca en ese valor y escala bod_k1 al moverlo.
 // Superficies asumidas: bodega tradicional 45 m², hard discount 175 m².
-// Celdas en el decil superior del perfil aprendido: en el backtesting, el 76 %
+// Celdas en el decil superior del perfil aprendido: en el backtesting, el 72 %
 // de las 50 mejor puntuadas con el estado de 2024 recibió una apertura de la
 // cadena a menos de 750 m en 2025-2026. Se advierte sin alterar el ranking.
 export const UMBRAL_ENTRADA_CADENA = 0.90
@@ -27,7 +31,10 @@ export const M2_MASS = 175
 export const ALPHA = 1.0
 
 export function huff(h, p, superficie = p.superficie) {
-  const bodegas = Math.max(h.n_comp_osm_k1, h.pob_k1 / p.habPorBodega)
+  const estimadas = h.bod_k1 != null && p.hCampo
+    ? h.bod_k1 * p.hCampo / p.habPorBodega
+    : h.pob_k1 / p.habPorBodega
+  const bodegas = Math.max(h.n_comp_osm_k1, estimadas)
   const aNueva = superficie ** ALPHA
   const aRival = bodegas * M2_BODEGA ** ALPHA + h.mass_k1_2026 * M2_MASS ** ALPHA
   const cuota = aNueva + aRival > 0 ? aNueva / (aNueva + aRival) : 1
@@ -59,6 +66,7 @@ export const useSigret = defineStore('sigret', {
       radioAmenaza: 750,   // alcance en metros de ese castigo (mediana del panel)
       pobMinima: 1500,     // umbral de viabilidad
       habPorBodega: 120,   // densidad de oferta informal estimada
+      hCampo: null,        // h del conteo de campo, si existe (meta.campo.h)
       gastoPerCapita: 180, // S/ mensuales en canal bodega
       inversion: 160000,   // S/ de inversión inicial
       margen: 0.22,        // margen bruto del canal
@@ -127,7 +135,7 @@ export const useSigret = defineStore('sigret', {
     kpis(state) {
       const todos = this.hexesCalculados
       const viables = todos.filter(h => h.viable)
-      const pob = todos.reduce((s, h) => s + h.pob_2017, 0)
+      const pob = todos.reduce((s, h) => s + h.pob, 0)
       const cv = state.meta?.cv_espacial ?? []
       const ens = (state.meta?.backtesting ?? []).find(r => r.modelo.startsWith('Ensamble'))
       const tasaBaseCv = state.meta?.tasa_base_cv ?? 0
@@ -205,6 +213,10 @@ export const useSigret = defineStore('sigret', {
         this.mass = ms
         this.competencia = cp
         this.meta = mt
+        if (mt.campo?.h) {
+          this.p.hCampo = Math.round(mt.campo.h)
+          this.p.habPorBodega = this.p.hCampo
+        }
         this.filtros.distritos = [...hx.districts]
         this.ready = true
       }
@@ -218,12 +230,14 @@ export const useSigret = defineStore('sigret', {
     },
 
     reset() {
+      const hCampo = this.p.hCampo
       this.p = {
         wPerfil: 0.344,
         penalizacion: 0.261,
         radioAmenaza: 750,
         pobMinima: 1500,
-        habPorBodega: 120,
+        habPorBodega: hCampo ?? 120,
+        hCampo,
         gastoPerCapita: 180,
         inversion: 160000,
         margen: 0.22,

@@ -1,0 +1,3 @@
+﻿version,cuota_importancia_fuga,variable_principal,ROC_AUC,PR_AUC,P@20,aciertos@20,Lift@10%
+Con distancia y tiendas vecinas (fuga),0.49821499713890316,d_mass_2024,0.7427391774316446,0.0713318490244099,0.1,2,2.574497574497575
+Sin esas variables (pipeline),0.0,pob_celda,0.8309145358212394,0.1106363654401521,0.15,3,4.376645876645877

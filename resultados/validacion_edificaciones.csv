@@ -1,0 +1,3 @@
+indicador,clave,R2_reparto_2017,spearman_celdas,error_abs_medio,pob_media_celda,elegido,spearman_distritos_crec_vs_edif_nuevas,pearson_distritos_crec_vs_edif_nuevas,n_distritos_crecen
+Numero de edificaciones,cnt,0.8983325505202461,0.9311728838686061,77.07231188064922,273.8851224105466,True,0.7264705882352941,0.9399626225653875,16
+Volumen construido,vol,0.7527046158693901,0.8903518899628461,105.01033316246087,273.8851224105466,False,0.7264705882352941,0.9399626225653875,16

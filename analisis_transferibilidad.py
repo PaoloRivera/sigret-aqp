@@ -63,7 +63,7 @@ COMPONENTES = {
 }
 
 FAMILIAS = {
-    "Demanda poblacional": ["pob_2017", "area_km2", "dens_hab_km2", "n_mz", "pob_k1",
+    "Demanda poblacional": ["pob_celda", "area_km2", "dens_hab_km2", "n_mz", "pob_k1",
                             "pob_k2", "pob_k3", "pob_k1_ext"],
     "Morfología vial": ["n_nodos", "n_intersec", "long_vial_m", "long_princ_m",
                         "dens_intersec_km2", "long_vial_km_km2", "pct_vial_princ"],
@@ -202,6 +202,14 @@ def main():
         for bn, col in (("Densidad poblacional", "dens_hab_km2"), ("Población alcanzable", "pob_k1")):
             base.append({"objetivo": nombre, "linea_base": bn,
                          **metricas(y, F[col].values.astype(float), viable)})
+
+    # puntuaciones fuera de muestra (media de semillas) para las pruebas de significancia
+    oof_df = pd.DataFrame({"h3": F["h3"].values, "bloque": F["bloque"].values})
+    for nombre in Y:
+        oof_df[f"y|{nombre}"] = Y[nombre]
+        for conj in ("completo", "estructural", "demografico_vial"):
+            oof_df[f"oof|{nombre}|{conj}"] = OOF[(nombre, conj)]["Ensamble"]
+    oof_df.to_parquet(f"{OUT}/transfer_oof.parquet")
 
     pd.DataFrame(resumen).to_csv(f"{OUT}/transfer_resumen.csv", index=False)
     M = pd.concat(filas)

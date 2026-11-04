@@ -1,0 +1,96 @@
+Poblacion: 2025 | salida: resultados
+[1] Malla H3 y poblacion censal
+    manzanas: 21,705 | poblacion: 1,018,031
+    hexagonos: 3,717 | poblacion repartida: 1,018,031
+[2] Red historica de tiendas Mass
+    snapshot 2024: 86 tiendas
+    snapshot 2025: 118 tiendas
+    snapshot 2026: 126 tiendas
+    snapshot actual: 136 tiendas
+    tiendas unicas: 127 | hexagonos: 124
+    aperturas por anio:
+anio_apertura
+2024    86
+2025    32
+2026     9
+[2b] Poblacion actualizada al Censo 2025 (edificaciones satelitales)
+    indicador: Numero de edificaciones | R2 reparto 2017 = 0.898 | Spearman celdas = 0.931 | Spearman distritos = 0.726
+    fraccion al corte 2024 = 0.909 | malla: 2017 1,018,031 -> 2024 1,192,850 -> 2025 1,210,286 | fuera de la malla 2025: 9,895
+[3] Ingenieria de features (capas OSM: data/osm)
+    competencia OSM (2026): 182 | excluidos por cadena: 13 (nombre 8, < 50 m 8)
+    matriz: 3,717 hexagonos x 52 columnas
+[3] Ingenieria de features (capas OSM: data/osm_2024)
+    competencia OSM (2024): 158 | excluidos por cadena: 4 (nombre 2, < 50 m 3)
+    matriz: 3,717 hexagonos x 52 columnas
+[4] Entrenamiento y validacion
+    candidatos viables sin Mass en 2024: 1,486
+    aperturas reales 2025-26: 39 (2.62%)
+
+    --- Backtesting temporal ---
+             modelo  PR_AUC  ROC_AUC  P@20  Lift@10%  acierto@20
+  Baseline densidad   0.084    0.812  0.10     2.832           2
+   Baseline pob. k1   0.098    0.790  0.20     3.089           4
+   Baseline POIs k1   0.060    0.728  0.05     2.832           1
+Regresion logistica   0.089    0.817  0.05     3.604           1
+      Random Forest   0.093    0.825  0.10     4.119           2
+            XGBoost   0.102    0.808  0.20     4.119           4
+Ensamble (rank avg)   0.111    0.831  0.15     4.377           3
+
+    --- Validacion cruzada espacial (52 bloques H3 r6) ---
+    LR    PR-AUC 0.208   ROC-AUC 0.864
+    RF    PR-AUC 0.237   ROC-AUC 0.932
+    XGB   PR-AUC 0.258   ROC-AUC 0.921
+    ENS   PR-AUC 0.261   ROC-AUC 0.917
+
+    Top 10 variables:
+    pob_celda            0.1544
+    dens_hab_km2         0.1424
+    pob_k1               0.0831
+    pob_k1_ext           0.0751
+    n_poi_k1             0.0679
+    n_colegio_k1         0.0539
+    pob_k2               0.0481
+    n_mz                 0.0460
+    dens_intersec_km2    0.0408
+    long_princ_m         0.0379
+[5] Score y ranking
+
+    --- TOP 20 UBICACIONES ---
+          DIST    pob_k1  n_comp_osm_k1  d_mass_2026  p_potencial  SCORE     lat     lon
+         CAYMA  7076.731            0.0      738.506        0.960  0.973 -16.353 -71.543
+CERRO COLORADO  7706.929            0.0      789.194        0.939  0.973 -16.350 -71.558
+    MIRAFLORES  8156.165            0.0      773.695        0.934  0.972 -16.375 -71.504
+ JACOBO HUNTER  8000.201            0.0      852.439        0.933  0.972 -16.457 -71.555
+    MIRAFLORES 10649.682            0.0      890.290        0.922  0.971 -16.380 -71.507
+CERRO COLORADO  7701.217            0.0      974.340        0.919  0.966 -16.347 -71.558
+         CAYMA 10013.131            0.0      776.310        0.890  0.960 -16.347 -71.552
+ JACOBO HUNTER  8822.204            0.0      832.691        0.890  0.958 -16.450 -71.560
+    MIRAFLORES  7868.393            0.0      793.337        0.893  0.958 -16.383 -71.507
+         CAYMA  8930.003            0.0      731.865        0.895  0.954 -16.349 -71.555
+ JACOBO HUNTER  4207.678            0.0     1214.624        0.944  0.952 -16.461 -71.555
+ JACOBO HUNTER  8727.053            0.0      828.243        0.870  0.951 -16.456 -71.557
+    MIRAFLORES 10024.828            0.0      661.825        0.948  0.950 -16.376 -71.507
+CERRO COLORADO  4396.877            0.0      946.779        0.923  0.949 -16.375 -71.569
+    MIRAFLORES  6643.400            0.0     1143.294        0.876  0.947 -16.382 -71.504
+      SOCABAYA  5843.383            0.0     1311.995        0.883  0.947 -16.461 -71.522
+MARIANO MELGAR  5466.362            0.0      926.641        0.888  0.945 -16.392 -71.493
+      SOCABAYA  5464.380            0.0      813.085        0.883  0.944 -16.453 -71.539
+    MIRAFLORES  7402.524            0.0     1015.427        0.856  0.943 -16.373 -71.500
+          YURA  4538.992            0.0     1119.683        0.901  0.942 -16.315 -71.602
+
+    Top-50 por distrito:
+    DIST
+    CERRO COLORADO       12
+    MIRAFLORES           11
+    JACOBO HUNTER         7
+    CAYMA                 6
+    SOCABAYA              6
+    PAUCARPATA            3
+    MARIANO MELGAR        2
+    YURA                  1
+    ALTO SELVA ALEGRE     1
+    JLBR                  1
+
+=== PIPELINE COMPLETO ===
+  en resultados/: grid.parquet · features.parquet · resultado_final.parquet
+  features_2024.parquet · resultados_backtesting.csv · resultados_cv.csv · importancia_variables.csv

@@ -50,3 +50,10 @@ TESIS/
 
 # ── Configuración local del asistente ───────────────────────────────
 .claude/
+
+# Copia de los resultados de la version 7 de la tesis (poblacion 2017)
+respaldo_tesis_v7/
+
+# Exportacion y fotos del conteo de campo: ubican bodegas que funcionan en
+# viviendas. Se publican solo los conteos por celda (resultados/campo/).
+data/campo/kobo/

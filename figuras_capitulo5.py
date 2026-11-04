@@ -7,10 +7,8 @@ variables, comparacion de modelos, distribucion territorial del Top-50, pesos
 elicitados por AHP, puntajes SUS, dimensiones TAM, resultados por perfil de
 usuario y comparacion entre las dos estrategias de validacion.
 """
-import glob
 import os
 
-import geopandas as gpd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -41,7 +39,7 @@ def guardar(fig, nombre):
 
 
 ETIQUETAS = {
-    "pob_2017": "Población del hexágono", "dens_hab_km2": "Densidad poblacional",
+    "pob_celda": "Población del hexágono", "dens_hab_km2": "Densidad poblacional",
     "pob_k1": "Población alcanzable a 500 m", "pob_k1_ext": "Población del anillo externo",
     "n_poi_k1": "POIs generadores a 500 m", "n_colegio_k1": "Colegios a 500 m",
     "pob_k2": "Población alcanzable a 800 m", "n_mz": "Número de manzanas",
@@ -101,11 +99,12 @@ UBIGEOS = {
     "040123": "TIABAYA", "040124": "UCHUMAYO", "040126": "YANAHUARA",
     "040128": "YURA", "040129": "JLBR",
 }
-mz = gpd.read_file(glob.glob("data/inei/*Manzanas_Poblacion*.dbf")[0], ignore_geometry=True)
-pob_dist = mz.groupby(mz["UBIGEO"].map(UBIGEOS))["T_TOTAL"].sum()
+# Poblacion censada 2025 por distrito (INEI, 2026)
+cen = pd.read_csv("data/inei/poblacion_censada_distritos.csv", dtype={"ubigeo": str})
+pob_dist = cen.set_index(cen["ubigeo"].map(UBIGEOS))["pob_2025_censada"]
 R = pd.read_parquet(f"{RES}/resultado_final.parquet")
 top50 = R[R["viable"]].nlargest(50, "SCORE")["DIST"].value_counts()
-dist = [d.title() for d in top50.index]
+dist = ["J. L. Bustamante y Rivero" if d == "JLBR" else d.title() for d in top50.index]
 n = top50.tolist()
 pob = [int(pob_dist[d]) for d in top50.index]
 fig, ax = plt.subplots(figsize=(8.4, 4.6))
@@ -117,7 +116,7 @@ ax.set_xlabel("Ubicaciones en el Top-50")
 ax.set_title("Distribución territorial de las oportunidades identificadas",
              loc="left", weight="bold")
 for yy, v, p in zip(y, n, pob):
-    ax.text(v + .18, yy, f"{v}   ({p:,} hab.)".replace(",", " "), va="center", fontsize=8)
+    ax.text(v + .18, yy, f"{v}   ({p:,} hab. en 2025)".replace(",", " "), va="center", fontsize=8)
 ax.set_xlim(0, max(n) + 5)
 guardar(fig, "figura23_distribucion_territorial.png")
 

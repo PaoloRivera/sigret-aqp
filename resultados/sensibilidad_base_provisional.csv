@@ -1,0 +1,73 @@
+﻿base,parametro,variacion_pct,permanencia
+Elicitado,Peso del perfil de sitio,-20,1.0
+Elicitado,Peso del perfil de sitio,-15,1.0
+Elicitado,Peso del perfil de sitio,-10,1.0
+Elicitado,Peso del perfil de sitio,-5,1.0
+Elicitado,Peso del perfil de sitio,0,1.0
+Elicitado,Peso del perfil de sitio,5,1.0
+Elicitado,Peso del perfil de sitio,10,0.9
+Elicitado,Peso del perfil de sitio,15,0.9
+Elicitado,Peso del perfil de sitio,20,0.9
+Elicitado,Penalizacion,-20,0.9
+Elicitado,Penalizacion,-15,1.0
+Elicitado,Penalizacion,-10,1.0
+Elicitado,Penalizacion,-5,1.0
+Elicitado,Penalizacion,0,1.0
+Elicitado,Penalizacion,5,1.0
+Elicitado,Penalizacion,10,1.0
+Elicitado,Penalizacion,15,1.0
+Elicitado,Penalizacion,20,1.0
+Elicitado,Radio de amenaza,-20,0.4
+Elicitado,Radio de amenaza,-15,0.6
+Elicitado,Radio de amenaza,-10,0.8
+Elicitado,Radio de amenaza,-5,0.9
+Elicitado,Radio de amenaza,0,1.0
+Elicitado,Radio de amenaza,5,0.9
+Elicitado,Radio de amenaza,10,0.7
+Elicitado,Radio de amenaza,15,0.6
+Elicitado,Radio de amenaza,20,0.3
+Elicitado,Umbral de poblacion,-20,1.0
+Elicitado,Umbral de poblacion,-15,1.0
+Elicitado,Umbral de poblacion,-10,1.0
+Elicitado,Umbral de poblacion,-5,1.0
+Elicitado,Umbral de poblacion,0,1.0
+Elicitado,Umbral de poblacion,5,1.0
+Elicitado,Umbral de poblacion,10,1.0
+Elicitado,Umbral de poblacion,15,1.0
+Elicitado,Umbral de poblacion,20,1.0
+Provisional,Peso del perfil de sitio,-20,1.0
+Provisional,Peso del perfil de sitio,-15,1.0
+Provisional,Peso del perfil de sitio,-10,1.0
+Provisional,Peso del perfil de sitio,-5,1.0
+Provisional,Peso del perfil de sitio,0,1.0
+Provisional,Peso del perfil de sitio,5,1.0
+Provisional,Peso del perfil de sitio,10,0.9
+Provisional,Peso del perfil de sitio,15,0.9
+Provisional,Peso del perfil de sitio,20,0.9
+Provisional,Penalizacion,-20,0.9
+Provisional,Penalizacion,-15,1.0
+Provisional,Penalizacion,-10,1.0
+Provisional,Penalizacion,-5,1.0
+Provisional,Penalizacion,0,1.0
+Provisional,Penalizacion,5,1.0
+Provisional,Penalizacion,10,1.0
+Provisional,Penalizacion,15,1.0
+Provisional,Penalizacion,20,1.0
+Provisional,Radio de amenaza,-20,0.5
+Provisional,Radio de amenaza,-15,0.6
+Provisional,Radio de amenaza,-10,0.7
+Provisional,Radio de amenaza,-5,0.8
+Provisional,Radio de amenaza,0,1.0
+Provisional,Radio de amenaza,5,0.6
+Provisional,Radio de amenaza,10,0.5
+Provisional,Radio de amenaza,15,0.4
+Provisional,Radio de amenaza,20,0.3
+Provisional,Umbral de poblacion,-20,1.0
+Provisional,Umbral de poblacion,-15,1.0
+Provisional,Umbral de poblacion,-10,1.0
+Provisional,Umbral de poblacion,-5,1.0
+Provisional,Umbral de poblacion,0,1.0
+Provisional,Umbral de poblacion,5,1.0
+Provisional,Umbral de poblacion,10,1.0
+Provisional,Umbral de poblacion,15,1.0
+Provisional,Umbral de poblacion,20,1.0

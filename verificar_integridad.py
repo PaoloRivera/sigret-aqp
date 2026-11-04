@@ -2,10 +2,12 @@
 """
 verificar_integridad.py
 
-Genera la Tabla 6 del Capitulo IV: corre las verificaciones de integridad del
+Genera la Tabla 7 del Capitulo IV: corre las verificaciones de integridad del
 pipeline (conservacion de la poblacion, cobertura de la malla, composicion de
 celdas, normalizacion de codigos, limpieza numerica, ausencia de fuga de
-informacion, independencia de las particiones espaciales, exclusion de la\ncadena en la competencia OSM y corte temporal del backtesting) y las exporta a CSV.
+informacion, independencia de las particiones espaciales, exclusion de la
+cadena en la competencia OSM, corte temporal del backtesting y actualizacion de
+la poblacion al Censo 2025) y las exporta a CSV.
 """
 import glob
 
@@ -40,7 +42,7 @@ mz = mz[mz["UBIGEO"].isin(UBIGEOS)]
 pob_mz = pd.to_numeric(mz["T_TOTAL"], errors="coerce").fillna(0).sum()
 
 grid = gpd.read_parquet(f"{OUT}/grid.parquet")
-pob_hx = grid["pob_2017"].sum()
+pob_hx = grid["pob_2017"].sum()      # poblacion censal 2017 repartida en la malla
 err = abs(pob_hx - pob_mz) / pob_mz * 100
 
 chk("Conservacion de la poblacion en la ponderacion areal",
@@ -139,6 +141,34 @@ consistente = int(F24["n_comp_osm"].sum()) == len(c24)
 chk("Corte temporal de los predictores del backtesting",
     "Los predictores del backtesting provienen de capas OSM con fecha <= 2024-12-31",
     f"capas OSM al {fecha}; {len(c24)} competidores en la matriz de 2024", fecha <= "2024-12-31" and consistente)
+
+# 11. Actualizacion de la poblacion: el reparto conserva el crecimiento censal de
+#     cada distrito y el backtesting usa la poblacion reconstruida al corte
+import os
+if os.path.exists(f"{OUT}/poblacion_celdas.parquet"):
+    PC = pd.read_parquet(f"{OUT}/poblacion_celdas.parquet")
+    cen = pd.read_csv(f"{DATA}/inei/poblacion_censada_distritos.csv", dtype={"ubigeo": str})
+    import poblacion_actualizada as pa
+    cen["DIST"] = cen["ubigeo"].map(pa.UBIGEO_A_DIST)
+    cen = cen.set_index("DIST")
+    g = PC.groupby("DIST")[["pob_2017", "pob_2025"]].sum()
+    G = cen["pob_2025_censada"] - cen["pob_2017_censada"]
+    crece = G[G > 0].index
+    err_crec = (((g.loc[crece, "pob_2025"] - g.loc[crece, "pob_2017"]) - G[crece]).abs() / G[crece]).max() * 100
+    baja = G[G <= 0].index
+    err_baja = ((g.loc[baja, "pob_2025"] / g.loc[baja, "pob_2017"]
+                 - cen.loc[baja, "pob_2025_censada"] / cen.loc[baja, "pob_2017_censada"]).abs().max() * 100
+                if len(baja) else 0.0)
+    chk("Conservacion del crecimiento censal en la actualizacion de la poblacion",
+        "El reparto por edificaciones reproduce el crecimiento 2017-2025 de cada distrito (diferencia < 0.01 %)",
+        f"{len(crece)} distritos que crecen: diferencia maxima {err_crec:.4f} %; "
+        f"{len(baja)} que decrecen: diferencia {err_baja:.4f} %", err_crec < 0.01 and err_baja < 0.01)
+    m = PC[PC["en_malla"]].set_index("h3")
+    d24 = (F24.set_index("h3")["pob_celda"] - m["pob_2024"].reindex(F24["h3"]).values).abs().max()
+    d25 = (F.set_index("h3")["pob_celda"] - m["pob_2025"].reindex(F["h3"]).values).abs().max()
+    chk("Fecha de la poblacion en los predictores",
+        "El ranking usa la poblacion 2025 y el backtesting la poblacion al 31-12-2024",
+        f"diferencia maxima: {d25:.1e} hab. (2025) y {d24:.1e} hab. (2024)", d24 < 1e-6 and d25 < 1e-6)
 
 T = pd.DataFrame(filas)
 T.to_csv(f"{OUT}/tabla6_integridad.csv", index=False, encoding="utf-8-sig")

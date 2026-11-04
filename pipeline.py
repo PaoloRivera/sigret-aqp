@@ -6,7 +6,20 @@ Pipeline reproducible completo para la localizacion optima de minimarkets en
 Arequipa Metropolitana: construye la malla H3 con poblacion censal, reconstruye
 la red historica de tiendas Mass, genera la matriz de features, entrena y valida
 los modelos de prediccion y calcula el score y el ranking final de ubicaciones.
+
+Poblacion de las celdas (opcion --poblacion):
+  2025  (modelo principal) poblacion del Censo 2017 por manzanas actualizada al
+        Censo 2025: el crecimiento de cada distrito se reparte entre sus celdas
+        segun las edificaciones nuevas observadas por satelite (ver
+        poblacion_actualizada.py). El ranking usa la poblacion 2025 y el
+        backtesting la poblacion reconstruida al 31-12-2024.
+  2017  poblacion del Censo 2017 sin actualizar (corrida de comparacion).
+
+Uso:
+  python pipeline.py                                   # modelo principal
+  python pipeline.py --poblacion 2017 --salida resultados/base_censo2017
 """
+import argparse
 import glob
 import os
 import re
@@ -201,7 +214,23 @@ def filtrar_cadenas(comp, mass, corte):
     return comp[~excluir].copy()
 
 
-def features(grid, mass, osm=f"{DATA}/osm", corte=2026, archivo="features.parquet"):
+def poblacion_celdas(grid, modo):
+    """Poblacion por celda H3 (incluye celdas vecinas fuera de la malla).
+    Devuelve dos diccionarios h3 -> habitantes: (actual, corte del backtesting)."""
+    if modo == "2017":
+        p = dict(zip(grid["h3"], grid["pob_2017"]))
+        return p, p
+    import poblacion_actualizada as pa
+    print("[2b] Poblacion actualizada al Censo 2025 (edificaciones satelitales)")
+    C, R, V = pa.calcular(grid)
+    C.to_parquet(f"{OUT}/poblacion_celdas.parquet")
+    R.to_csv(f"{OUT}/poblacion_distritos.csv", encoding="utf-8-sig")
+    V.to_csv(f"{OUT}/validacion_edificaciones.csv", index=False)
+    return dict(zip(C["h3"], C["pob_2025"])), dict(zip(C["h3"], C["pob_2024"]))
+
+
+def features(grid, mass, pob, osm=f"{DATA}/osm", corte=2026, archivo="features.parquet"):
+    """pob: diccionario h3 -> poblacion de la celda en la fecha de los predictores."""
     print(f"[3] Ingenieria de features (capas OSM: {osm})")
     poi = gpd.read_parquet(f"{osm}/poi_flujo.parquet")
     comp = filtrar_cadenas(gpd.read_parquet(f"{osm}/competencia.parquet"), mass, corte)
@@ -210,13 +239,14 @@ def features(grid, mass, osm=f"{DATA}/osm", corte=2026, archivo="features.parque
     nodes = gpd.read_parquet(f"{osm}/red_nodes.parquet")
 
     F = grid[["h3", "DIST", "pob_2017", "area_km2", "dens_hab_km2",
-              "es_nucleo", "n_mz"]].copy()
+              "es_nucleo", "n_mz"]].rename(columns={"pob_2017": "pob_celda"})
     F["DIST"] = F["DIST"].fillna("SIN_DATO").astype(str)
+    F["pob_celda"] = F["h3"].map(pob).fillna(0.0)
+    F["dens_hab_km2"] = F["pob_celda"] / F["area_km2"]
 
-    pob = dict(zip(grid["h3"], grid["pob_2017"]))
     for k in (1, 2, 3):
         F[f"pob_k{k}"] = [sum(pob.get(v, 0) for v in h3.grid_disk(c, k)) for c in F["h3"]]
-    F["pob_k1_ext"] = F["pob_k1"] - F["pob_2017"]
+    F["pob_k1_ext"] = F["pob_k1"] - F["pob_celda"]
 
     nodes["h3"] = [h3.latlng_to_cell(y, x, RES)
                    for y, x in zip(nodes.geometry.y, nodes.geometry.x)]
@@ -317,7 +347,8 @@ def modelos(F, F24):
 
     y24 = F["mass_2024"].values
     abrio = ((F["mass_2026"] == 1) & (F["mass_2024"] == 0)).astype(int).values
-    viable = (F["pob_k1"] >= 1500).values
+    b24 = F24.set_index("h3").loc[F["h3"]]
+    viable = (b24["pob_k1"] >= 1500).values          # poblacion al corte del backtesting
     cand = viable & (y24 == 0)
     print(f"    candidatos viables sin Mass en 2024: {cand.sum():,}")
     print(f"    aperturas reales 2025-26: {abrio[cand].sum()} "
@@ -336,7 +367,6 @@ def modelos(F, F24):
         d["acierto@20"] = int(t[o[:20]].sum())
         return d
 
-    b24 = F24.set_index("h3").loc[F["h3"]]
     res = [evaluar(b24["dens_hab_km2"].values, "Baseline densidad"),
            evaluar(b24["pob_k1"].values, "Baseline pob. k1"),
            evaluar(b24["n_poi_k1"].values, "Baseline POIs k1")]
@@ -349,6 +379,11 @@ def modelos(F, F24):
                                "XGB": "XGBoost"}[nom]))
     ens = np.mean([pd.Series(p).rank(pct=True) for p in probs.values()], axis=0)
     res.append(evaluar(ens, "Ensamble (rank avg)"))
+    pd.DataFrame({"h3": F["h3"].values[cand], "abrio": abrio[cand],
+                  **{k: v[cand] for k, v in probs.items()}, "ENS": ens[cand],
+                  "dens_hab_km2": b24["dens_hab_km2"].values[cand],
+                  "pob_k1": b24["pob_k1"].values[cand], "n_poi_k1": b24["n_poi_k1"].values[cand]}
+                 ).to_parquet(f"{OUT}/predicciones_backtesting.parquet")
     R = pd.DataFrame(res)
     print("\n    --- Backtesting temporal ---")
     print(R[["modelo", "PR_AUC", "ROC_AUC", "P@20", "Lift@10%", "acierto@20"]]
@@ -381,6 +416,7 @@ def modelos(F, F24):
                    "ROC_AUC": roc_auc_score(y, v)})
         print(f"    {k:4s}  PR-AUC {cv[-1]['PR_AUC']:.3f}   ROC-AUC {cv[-1]['ROC_AUC']:.3f}")
     pd.DataFrame(cv).to_csv(f"{OUT}/resultados_cv.csv", index=False)
+    pd.DataFrame({"h3": F["h3"].values, "y": y, **oof}).to_parquet(f"{OUT}/predicciones_cv.parquet")
 
     MF = hacer_modelos(y)
     F["p_potencial"] = np.mean(
@@ -422,10 +458,19 @@ def score(F, grid, gasto_mes=180, w_pot=0.344, pen_mass=0.261, radio=750, pob_mi
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--poblacion", choices=["2025", "2017"], default="2025",
+                    help="2025: poblacion actualizada (modelo principal); 2017: sin actualizar")
+    ap.add_argument("--salida", default=OUT, help="carpeta de resultados")
+    args = ap.parse_args()
+    OUT = args.salida
+    os.makedirs(OUT, exist_ok=True)
+    print(f"Poblacion: {args.poblacion} | salida: {OUT}")
     grid = construir_malla()
     mass = panel_mass()
-    F = features(grid, mass)
-    F24 = features(grid, mass, f"{DATA}/osm_2024", 2024, "features_2024.parquet")
+    pob_act, pob_corte = poblacion_celdas(grid, args.poblacion)
+    F = features(grid, mass, pob_act)
+    F24 = features(grid, mass, pob_corte, f"{DATA}/osm_2024", 2024, "features_2024.parquet")
     F = modelos(F, F24)
     out = score(F, grid)
     print("\n=== PIPELINE COMPLETO ===")

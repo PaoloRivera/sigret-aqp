@@ -6,11 +6,12 @@ const store = useSigret()
 onMounted(() => store.cargar())
 
 const nf = new Intl.NumberFormat('es-PE')
+const pobMax = computed(() => Math.max(1, ...(store.meta?.poblacion_distrito ?? []).map(d => d.p)))
 
 const fases = [
   {
     n: '01', t: 'Construcción de la malla',
-    d: 'Relleno de polígono, centroides y vértices de las 21 705 manzanas censales, más un anillo de expansión k=1. La población se transfiere por ponderación areal con 0 % de pérdida.',
+    d: 'Relleno de polígono, centroides y vértices de las 21 705 manzanas censales, más un anillo de expansión k=1. La población 2017 se transfiere por ponderación areal con 0 % de pérdida y se actualiza al Censo 2025 según las edificaciones nuevas detectadas por satélite.',
     o: '3 717 hexágonos H3 r9',
     ic: 'bx-grid-alt',
   },
@@ -47,7 +48,7 @@ const fases = [
 ]
 
 const stack = [
-  { g: 'Geoprocesamiento', i: ['GeoPandas', 'Shapely', 'h3-py', 'SciPy'] },
+  { g: 'Geoprocesamiento', i: ['GeoPandas', 'Shapely', 'h3-py', 'SciPy', 'rasterio', 'Earth Engine'] },
   { g: 'Aprendizaje automático', i: ['scikit-learn', 'XGBoost'] },
   { g: 'Interfaz', i: ['Vue 3', 'Vuetify', 'Pinia', 'ApexCharts'] },
   { g: 'Cartografía', i: ['MapLibre GL', 'h3-js', 'OpenFreeMap'] },
@@ -146,7 +147,7 @@ const stack = [
               <div class="capa-m">&lt; 10 ms</div>
             </div>
             <p class="nota mt-3">
-              Los datos servidos pesan 569 KB. La aplicación funciona sin
+              Los datos servidos pesan 574 KB. La aplicación funciona sin
               backend de cálculo.
             </p>
           </VCardText>
@@ -183,7 +184,7 @@ const stack = [
               Cobertura territorial
             </VCardTitle>
             <VCardSubtitle class="text-caption">
-              17 distritos de Arequipa Metropolitana · Censo Nacional 2017
+              17 distritos de Arequipa Metropolitana · población censada 2025 (INEI)
             </VCardSubtitle>
           </VCardItem>
           <VCardText>
@@ -196,7 +197,7 @@ const stack = [
                   <div class="dist-n">{{ d.d }}</div>
                   <div class="dist-p">{{ nf.format(d.p) }}</div>
                   <VProgressLinear
-                    :model-value="(d.p / 196909) * 100"
+                    :model-value="(d.p / pobMax) * 100"
                     color="primary" height="3" rounded class="mt-2"
                   />
                 </div>

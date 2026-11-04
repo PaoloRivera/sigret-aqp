@@ -1,0 +1,363 @@
+== 1/14 Corrida de comparacion con la poblacion del Censo 2017
+== 2/14 Modelo principal (poblacion actualizada al Censo 2025)
+Poblacion: 2025 | salida: resultados
+[1] Malla H3 y poblacion censal
+    manzanas: 21,705 | poblacion: 1,018,031
+    hexagonos: 3,717 | poblacion repartida: 1,018,031
+[2] Red historica de tiendas Mass
+    snapshot 2024: 86 tiendas
+    snapshot 2025: 118 tiendas
+    snapshot 2026: 126 tiendas
+    snapshot actual: 136 tiendas
+    tiendas unicas: 127 | hexagonos: 124
+    aperturas por anio:
+anio_apertura
+2024    86
+2025    32
+2026     9
+[2b] Poblacion actualizada al Censo 2025 (edificaciones satelitales)
+    indicador: Numero de edificaciones | R2 reparto 2017 = 0.898 | Spearman celdas = 0.931 | Spearman distritos = 0.726
+    fraccion al corte 2024 = 0.909 | malla: 2017 1,018,031 -> 2024 1,192,850 -> 2025 1,210,286 | fuera de la malla 2025: 9,895
+[3] Ingenieria de features (capas OSM: data/osm)
+    competencia OSM (2026): 182 | excluidos por cadena: 13 (nombre 8, < 50 m 8)
+    matriz: 3,717 hexagonos x 52 columnas
+[3] Ingenieria de features (capas OSM: data/osm_2024)
+    competencia OSM (2024): 158 | excluidos por cadena: 4 (nombre 2, < 50 m 3)
+    matriz: 3,717 hexagonos x 52 columnas
+[4] Entrenamiento y validacion
+    candidatos viables sin Mass en 2024: 1,486
+    aperturas reales 2025-26: 39 (2.62%)
+
+    --- Backtesting temporal ---
+             modelo  PR_AUC  ROC_AUC  P@20  Lift@10%  acierto@20
+  Baseline densidad   0.084    0.812  0.10     2.832           2
+   Baseline pob. k1   0.098    0.790  0.20     3.089           4
+   Baseline POIs k1   0.060    0.728  0.05     2.832           1
+Regresion logistica   0.089    0.817  0.05     3.604           1
+      Random Forest   0.093    0.825  0.10     4.119           2
+            XGBoost   0.102    0.808  0.20     4.119           4
+Ensamble (rank avg)   0.111    0.831  0.15     4.377           3
+
+    --- Validacion cruzada espacial (52 bloques H3 r6) ---
+    LR    PR-AUC 0.208   ROC-AUC 0.864
+    RF    PR-AUC 0.237   ROC-AUC 0.932
+    XGB   PR-AUC 0.258   ROC-AUC 0.921
+    ENS   PR-AUC 0.261   ROC-AUC 0.917
+
+    Top 10 variables:
+    pob_celda            0.1544
+    dens_hab_km2         0.1424
+    pob_k1               0.0831
+    pob_k1_ext           0.0751
+    n_poi_k1             0.0679
+    n_colegio_k1         0.0539
+    pob_k2               0.0481
+    n_mz                 0.0460
+    dens_intersec_km2    0.0408
+    long_princ_m         0.0379
+[5] Score y ranking
+
+    --- TOP 20 UBICACIONES ---
+          DIST    pob_k1  n_comp_osm_k1  d_mass_2026  p_potencial  SCORE     lat     lon
+         CAYMA  7076.731            0.0      738.506        0.960  0.973 -16.353 -71.543
+CERRO COLORADO  7706.929            0.0      789.194        0.939  0.973 -16.350 -71.558
+    MIRAFLORES  8156.165            0.0      773.695        0.934  0.972 -16.375 -71.504
+ JACOBO HUNTER  8000.201            0.0      852.439        0.933  0.972 -16.457 -71.555
+    MIRAFLORES 10649.682            0.0      890.290        0.922  0.971 -16.380 -71.507
+CERRO COLORADO  7701.217            0.0      974.340        0.919  0.966 -16.347 -71.558
+         CAYMA 10013.131            0.0      776.310        0.890  0.960 -16.347 -71.552
+ JACOBO HUNTER  8822.204            0.0      832.691        0.890  0.958 -16.450 -71.560
+    MIRAFLORES  7868.393            0.0      793.337        0.893  0.958 -16.383 -71.507
+         CAYMA  8930.003            0.0      731.865        0.895  0.954 -16.349 -71.555
+ JACOBO HUNTER  4207.678            0.0     1214.624        0.944  0.952 -16.461 -71.555
+ JACOBO HUNTER  8727.053            0.0      828.243        0.870  0.951 -16.456 -71.557
+    MIRAFLORES 10024.828            0.0      661.825        0.948  0.950 -16.376 -71.507
+CERRO COLORADO  4396.877            0.0      946.779        0.923  0.949 -16.375 -71.569
+    MIRAFLORES  6643.400            0.0     1143.294        0.876  0.947 -16.382 -71.504
+      SOCABAYA  5843.383            0.0     1311.995        0.883  0.947 -16.461 -71.522
+MARIANO MELGAR  5466.362            0.0      926.641        0.888  0.945 -16.392 -71.493
+      SOCABAYA  5464.380            0.0      813.085        0.883  0.944 -16.453 -71.539
+    MIRAFLORES  7402.524            0.0     1015.427        0.856  0.943 -16.373 -71.500
+          YURA  4538.992            0.0     1119.683        0.901  0.942 -16.315 -71.602
+
+    Top-50 por distrito:
+    DIST
+    CERRO COLORADO       12
+    MIRAFLORES           11
+    JACOBO HUNTER         7
+    CAYMA                 6
+    SOCABAYA              6
+    PAUCARPATA            3
+    MARIANO MELGAR        2
+    YURA                  1
+    ALTO SELVA ALEGRE     1
+    JLBR                  1
+
+=== PIPELINE COMPLETO ===
+  en resultados/: grid.parquet · features.parquet · resultado_final.parquet
+  features_2024.parquet · resultados_backtesting.csv · resultados_cv.csv · importancia_variables.csv
+== 3/14 Comparacion entre ambas poblaciones
+=== Modelo principal frente a la poblacion 2017 ===
+corrida                 Poblacion Censo 2017  Poblacion actualizada (Censo 2025)
+poblacion_malla                 1.018031e+06                        1.210286e+06
+celdas_viables                  1.220000e+03                        1.462000e+03
+candidatos_backtesting          1.259000e+03                        1.486000e+03
+aperturas                       3.900000e+01                        3.900000e+01
+CV_ROC_AUC_ENS                  9.167947e-01                        9.171231e-01
+CV_PR_AUC_ENS                   2.546756e-01                        2.614069e-01
+CV_ROC_AUC_RF                   9.288675e-01                        9.315602e-01
+BT_ROC_AUC_ENS                  8.090374e-01                        8.309145e-01
+BT_PR_AUC_ENS                   1.168193e-01                        1.106364e-01
+BT_Lift10_ENS                   4.906872e+00                        4.376646e+00
+BT_aciertos20_ENS               4.000000e+00                        3.000000e+00
+BT_ROC_AUC_mejor_base           7.865490e-01                        8.123970e-01
+
+=== Backtesting sobre los 1259 candidatos comunes ===
+                           corrida            modelo  candidatos_comunes  aperturas  ROC_AUC  PR_AUC  Lift@10%  aciertos@20
+              Poblacion Censo 2017          Ensamble                1259         39    0.809   0.117     4.907            4
+              Poblacion Censo 2017 Baseline densidad                1259         39    0.787   0.080     2.066            1
+              Poblacion Censo 2017  Baseline pob. k1                1259         39    0.754   0.092     3.099            3
+Poblacion actualizada (Censo 2025)          Ensamble                1259         39    0.801   0.111     3.874            3
+Poblacion actualizada (Censo 2025) Baseline densidad                1259         39    0.779   0.084     2.066            2
+Poblacion actualizada (Censo 2025)  Baseline pob. k1                1259         39    0.751   0.098     3.099            4
+
+=== Ranking: Spearman 0.978 | Top-10 8/10 | Top-20 19/20 | Top-50 41/50
+
+=== Top-50 por distrito ===
+                   Poblacion Censo 2017  Poblacion actualizada (Censo 2025)
+DIST                                                                       
+CERRO COLORADO                        7                                  12
+MIRAFLORES                            9                                  11
+JACOBO HUNTER                         9                                   7
+CAYMA                                 6                                   6
+SOCABAYA                              8                                   6
+PAUCARPATA                            3                                   3
+MARIANO MELGAR                        2                                   2
+ALTO SELVA ALEGRE                     1                                   1
+JLBR                                  0                                   1
+YURA                                  1                                   1
+TIABAYA                               2                                   0
+UCHUMAYO                              2                                   0
+== 4/14 Integridad (Tabla 6)
+                                                           Verificacion                                                                              Condicion de cumplimiento                                                                          Valor observado Se cumple
+                   Conservacion de la poblacion en la ponderacion areal                                        Diferencia entre poblacion censal y poblacion repartida < 0.5 %                                                         1,018,031 vs 1,018,031 (0.000 %)        Si
+                                     Cobertura de manzanas por la malla                                                      Ninguna manzana censal queda fuera de la malla H3                                                            0 manzanas sin celda asignada        Si
+                                                Composicion de la malla                                                 Nucleo censado + anillo de expansion = total de celdas                                                      2,597 nucleo + 1,120 anillo = 3,717        Si
+                           Normalizacion de codigos del panel historico                                    El conteo de tiendas unicas no varia tras normalizar capitalizacion                                                    127 sin normalizar vs 127 normalizado        Si
+                    Integridad numerica de la matriz de caracteristicas                                                       La matriz no contiene valores infinitos ni nulos                                                                     0 infinitos, 0 nulos        Si
+                         Exclusion de variables con fuga de informacion                                                    Ningun predictor deriva de la red de retail moderno                                                      37 predictores, 0 variables de fuga        Si
+                            Independencia de las particiones espaciales                                  Ningun bloque H3 r6 aparece en entrenamiento y prueba simultaneamente                                                                52 bloques, 0 compartidos        Si
+                             Comparacion contra lineas base univariadas                                                El backtesting evalua los 4 modelos y las 3 lineas base                                                                      7 modelos evaluados        Si
+                Exclusion de locales de la cadena en la competencia OSM                  Ningun competidor OSM coincide por nombre o a menos de 50 m con un local de la cadena         2024: 154 competidores, 0 coincidencias; 2026: 169 competidores, 0 coincidencias        Si
+                      Corte temporal de los predictores del backtesting                         Los predictores del backtesting provienen de capas OSM con fecha <= 2024-12-31                           capas OSM al 2024-12-31; 154 competidores en la matriz de 2024        Si
+Conservacion del crecimiento censal en la actualizacion de la poblacion El reparto por edificaciones reproduce el crecimiento 2017-2025 de cada distrito (diferencia < 0.01 %) 16 distritos que crecen: diferencia maxima 0.0000 %; 1 que decrecen: diferencia 0.0000 %        Si
+                               Fecha de la poblacion en los predictores                           El ranking usa la poblacion 2025 y el backtesting la poblacion al 31-12-2024                             diferencia maxima: 0.0e+00 hab. (2025) y 0.0e+00 hab. (2024)        Si
+
+>> tabla6_integridad.csv generada
+== 5/14 Sensibilidad (Tabla 15, Figura 25)
+parametro      Penalización hard discount  Peso del perfil de sitio  Radio de amenaza  Umbral de población
+variacion_pct                                                                                             
+-20                                   0.9                       1.0               0.4                  1.0
+-15                                   1.0                       1.0               0.6                  1.0
+-10                                   1.0                       1.0               0.8                  1.0
+-5                                    1.0                       1.0               0.9                  1.0
+ 0                                    1.0                       1.0               1.0                  1.0
+ 5                                    1.0                       1.0               0.9                  1.0
+ 10                                   1.0                       0.9               0.7                  1.0
+ 15                                   1.0                       0.9               0.6                  1.0
+ 20                                   1.0                       0.9               0.3                  1.0
+
+Permanencia minima observada: 30%
+Criterio (>= 70%): NO CUMPLE
+
+>> figura25_sensibilidad_ranking.png y tabla_sensibilidad.csv generadas
+== 6/14 Robustez de los parametros del score
+                     escenario     w   pen  radio  spearman_viables  top10_compartido_pct  top20_compartido_pct  top50_compartido_pct
+  Provisional del investigador 0.450 0.600    800             0.946                   0.7                  0.90                  0.70
+Sin segunda ronda, radio 750 m 0.298 0.275    750             0.997                   1.0                  0.95                  0.92
+Sin segunda ronda, radio 800 m 0.298 0.275    800             0.996                   0.9                  0.90                  0.80
+
+Permanencia del Top-10 (+-20 %) segun la base de parametros:
+parametro                  Penalizacion  Peso del perfil de sitio  Radio de amenaza  Umbral de poblacion
+base        variacion_pct                                                                               
+Elicitado   -20                     0.9                       1.0               0.4                  1.0
+            -15                     1.0                       1.0               0.6                  1.0
+            -10                     1.0                       1.0               0.8                  1.0
+            -5                      1.0                       1.0               0.9                  1.0
+             0                      1.0                       1.0               1.0                  1.0
+             5                      1.0                       1.0               0.9                  1.0
+             10                     1.0                       0.9               0.7                  1.0
+             15                     1.0                       0.9               0.6                  1.0
+             20                     1.0                       0.9               0.3                  1.0
+Provisional -20                     0.9                       1.0               0.5                  1.0
+            -15                     1.0                       1.0               0.6                  1.0
+            -10                     1.0                       1.0               0.7                  1.0
+            -5                      1.0                       1.0               0.8                  1.0
+             0                      1.0                       1.0               1.0                  1.0
+             5                      1.0                       1.0               0.6                  1.0
+             10                     1.0                       0.9               0.5                  1.0
+             15                     1.0                       0.9               0.4                  1.0
+             20                     1.0                       0.9               0.3                  1.0
+== 7/14 Figuras del Capitulo IV
+Con fuga: d_mass_2024 0.316, mass_k1_2024 0.183 = 49.8% de la importancia | backtesting ROC-AUC 0.743, P@20 0.10 (2 aciertos)
+Sin fuga: principal pob_celda 0.140 | backtesting ROC-AUC 0.831, P@20 0.15 (3 aciertos)
+  >> figura16_importancia_fuga.png
+  >> figura17_consola_entrenamiento.png
+  >> figura18_curvas_roc_pr.png
+  >> anexo_i_poblacion_2025.png
+== 8/14 Figuras del Capitulo V
+  >> figura20_importancia_variables.png
+  >> figura21_comparacion_modelos.png
+  >> figura23_distribucion_territorial.png
+  >> figura24_pesos_ahp.png
+  >> figura26_distribucion_sus.png
+  >> figura27_dimensiones_tam.png
+  >> figura28_resultados_perfil.png
+  >> figura22_desempeno_validaciones.png
+
+Ocho figuras generadas.
+== 9/14 Analisis complementarios
+[1] Fuga temporal: backtesting con tres versiones de los predictores OSM
+                                           escenario  PR_AUC  ROC_AUC  Lift@10%  aciertos@20
+                      OSM 2026 sin filtrar la cadena   0.113    0.824     4.377            4
+                   OSM 2026 sin locales de la cadena   0.119    0.831     4.119            4
+OSM al 31-12-2024 sin locales de la cadena (oficial)   0.111    0.831     4.377            3
+
+[2] Intervalos de confianza del backtesting oficial (bootstrap, B = 1000)
+           modelo  metrica  valor  IC95_inf  IC95_sup
+         Ensamble  ROC_AUC  0.831     0.775     0.874
+         Ensamble   PR_AUC  0.111     0.065     0.199
+         Ensamble Lift@10%  4.377     2.823     5.962
+Baseline densidad  ROC_AUC  0.812     0.764     0.857
+Baseline densidad   PR_AUC  0.084     0.052     0.158
+Baseline densidad Lift@10%  2.832     1.405     4.492
+ Baseline pob. k1  ROC_AUC  0.790     0.734     0.848
+ Baseline pob. k1   PR_AUC  0.098     0.056     0.196
+ Baseline pob. k1 Lift@10%  3.089     1.757     4.877
+ Baseline POIs k1  ROC_AUC  0.728     0.657     0.792
+ Baseline POIs k1   PR_AUC  0.060     0.037     0.106
+ Baseline POIs k1 Lift@10%  2.832     1.434     4.135
+
+ metrica                  comparacion  mejor_baseline  diferencia  IC95_inf  IC95_sup  incluye_cero
+ ROC_AUC Ensamble - Baseline densidad            True       0.019    -0.032     0.066          True
+  PR_AUC Ensamble - Baseline densidad           False       0.027    -0.050     0.102          True
+  PR_AUC  Ensamble - Baseline pob. k1            True       0.013    -0.080     0.093          True
+Lift@10% Ensamble - Baseline densidad           False       1.545    -0.648     3.673          True
+Lift@10%  Ensamble - Baseline pob. k1            True       1.287    -0.773     3.171          True
+
+[3] Validacion cruzada espacial por pliegue
+       PR_AUC        ROC_AUC       
+         mean    std    mean    std
+modelo                             
+ENS     0.260  0.050   0.926  0.051
+LR      0.237  0.055   0.900  0.086
+RF      0.227  0.046   0.928  0.042
+XGB     0.251  0.070   0.921  0.046
+    positivos por pliegue: [59, 29, 13, 7, 14]
+
+[4] I de Moran (esda; vecindad H3 de orden 1, pesos estandarizados por fila)
+                                       variable  I_Moran  p_valor       z
+Variable objetivo (tienda de la cadena en 2026)   0.0593    0.001  5.9957
+              Residuos RF, validacion aleatoria   0.0571    0.001  5.7253
+    Residuos RF, validacion espacial en bloques   0.0525    0.001  5.3031
+                          Poblacion de la celda   0.7860    0.001 74.3489
+
+                            particion  ROC_AUC_RF  ROC_AUC_ENS  PR_AUC_ENS
+Aleatoria (5 pliegues estratificados)       0.935        0.935       0.267
+          Espacial (52 bloques H3 r6)       0.932        0.917       0.266
+
+[5] Multicolinealidad (VIF, statsmodels)
+         variable  VIF_37  VIF_sin_identidades
+     dens_hab_km2     inf            7006141.5
+        pob_celda     inf            7005768.7
+       n_intersec     inf            5746459.5
+dens_intersec_km2     inf            5745507.9
+ long_vial_km_km2     inf            1892840.5
+      long_vial_m     inf            1891424.8
+           pob_k2   135.2                135.2
+           pob_k1     inf                 64.2
+           pob_k3    56.3                 56.3
+          n_nodos    32.5                 32.5
+      n_comida_k1     inf                 10.1
+  hab_por_comp_k1     9.1                  9.1
+    37 predictores: VIF infinito en 18 (identidades por construccion)
+    sin identidades (35): VIF > 10 en 11, VIF > 5 en 15
+
+[6] Area de aplicabilidad (Meyer y Pebesma, 2021)
+                  conjunto    n  pct_dentro_AOA
+          Todas las celdas 3717           0.942
+            Nucleo censado 2597           0.917
+       Anillo de expansion 1120           0.999
+Celdas viables del ranking 1462           0.876
+        Top-50 del ranking   50           0.920
+
+[7] Tasa de entrada de la cadena junto a las celdas mejor puntuadas en 2024
+                        conjunto    n  celdas_con_apertura_a_menos_de_750m  tasa_entrada  apertura_en_la_propia_celda
+    Top-10 con el estado de 2024   10                                    9         0.900                            2
+    Top-20 con el estado de 2024   20                                   16         0.800                            3
+    Top-50 con el estado de 2024   50                                   36         0.720                            5
+Todas las celdas viables en 2024 1486                                  450         0.303                           39
+
+>> resultados/analisis_*.csv generados
+== 10/14 IC de la validacion espacial
+Bloques: 52 | remuestreos validos: 1000
+modelo  ROC_AUC  IC95_inf  IC95_sup  IC_supera_0.85
+    LR    0.864     0.791     0.960           False
+    RF    0.932     0.897     0.965            True
+   XGB    0.921     0.881     0.965            True
+   ENS    0.917     0.869     0.969            True
+== 11/14 Simulador (Tabla 5, Tabla 12, Anexo J)
+=== Celda representativa (Jacobo Hunter, puesto 4 del Top-10, score 0.972, h3 89b3354888bffff) ===
+               1265
+P         8000.2011
+N           66.6683
+A_rival   3000.0754
+cuota        0.0323
+ventas   46451.6506
+margen   10219.3631
+payback     15.6566
+Con +15 % de poblacion: 46648.0
+
+=== Celdas viables (n = 1462) ===
+        ventas  payback
+count   1462.0   1462.0
+mean   43117.6     16.9
+std     2360.1      1.0
+min    25577.1     15.5
+5%     38608.6     15.8
+50%    43476.2     16.7
+95%    46147.8     18.8
+max    46959.5     28.4
+Techo teorico de ventas  S0*g*h/s_b = 48000.0
+Celdas viables donde el conteo OSM supera la estimacion: 2
+
+=== Sensibilidad a h (Anexo J) ===
+  h  bodegas_JH  cuota_JH_%  ventas_JH  margen_JH  payback_JH  payback_mediana_viables
+ 60      133.34        1.64   23606.57    5193.44       30.81                    31.88
+ 90       88.89        2.44   35121.97    7726.83       20.71                    21.78
+120       66.67        3.23   46451.65   10219.36       15.66                    16.73
+150       53.33        4.00   57600.06   12672.01       12.63                    13.70
+200       40.00        5.26   75789.57   16673.71        9.60                    10.67
+== 12/14 Datos de la aplicacion web
+[1] hexes.json
+    3,717 celdas · 25 columnas · 541 KB
+[2] mass.json
+    127 tiendas
+[3] competencia.json
+    182 comercios
+[4] meta.json
+    Regresión logística    PR-AUC 0.208  ROC-AUC 0.864
+    Random Forest          PR-AUC 0.237  ROC-AUC 0.932
+    XGBoost                PR-AUC 0.258  ROC-AUC 0.921
+    Ensamble               PR-AUC 0.261  ROC-AUC 0.917
+    top 3: Población del hexágono 0.1544, Densidad poblacional 0.1424, Población a 500 m 0.0831
+    aperturas por año: {'2024': 86, '2025': 32, '2026': 9}
+
+=== LISTO === 574 KB en app_web/public/data
+== 13/14 Figura 19 (datos servidos)
+  >> figura19_datos_servidos.png (574 KB servidos; ahorro 67.0 %)
+== 14/14 Figuras 1, 2 y 4 (diagramas)
+  >> figura01_fuentes_datos.png
+  >> figura02_arquitectura.png
+  >> figura04_flujo_modelado.png
+== LISTO

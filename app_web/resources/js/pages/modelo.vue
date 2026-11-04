@@ -5,6 +5,7 @@ import { dataViz } from '@/plugins/vuetify/theme'
 
 const store = useSigret()
 const theme = useTheme()
+const nf = new Intl.NumberFormat('es-PE')
 
 onMounted(() => store.cargar())
 
@@ -102,9 +103,9 @@ const limitaciones = [
     s: 'Montar OSRM con perfil peatonal y recalcular las matrices sobre la red.',
   },
   {
-    t: 'Base censal de 2017',
-    d: 'Es el último censo con desagregación a manzana disponible. Las áreas de expansión posteriores están subrepresentadas, lo que afecta sobre todo a Cerro Colorado y Yura.',
-    s: 'Incorporar el Censo 2025 cuando publique el nivel de manzana.',
+    t: 'Población 2025 estimada dentro de cada distrito',
+    d: 'La población por manzana del Censo 2017 se actualizó al Censo 2025 repartiendo el crecimiento de cada distrito según las edificaciones nuevas detectadas por satélite (Google Open Buildings). El total de cada distrito es oficial; su reparto entre celdas es una estimación.',
+    s: 'Reemplazar el reparto por la población del Censo 2025 por manzana cuando el INEI la publique.',
   },
   {
     t: 'Proxy de éxito comercial',
@@ -176,7 +177,7 @@ const limitaciones = [
                   <div class="flujo-paso">
                     <span class="flujo-n">2</span>
                     <div>
-                      <div class="flujo-t">Rankear 1,259 candidatos</div>
+                      <div class="flujo-t">Rankear {{ nf.format(store.meta?.candidatos_bt ?? 0) }} candidatos</div>
                       <div class="flujo-d">Celdas viables sin tienda en 2024</div>
                     </div>
                   </div>
@@ -231,7 +232,8 @@ const limitaciones = [
               Backtesting temporal
             </VCardTitle>
             <VCardSubtitle class="text-caption">
-              39 aperturas reales entre 1,259 candidatos · tasa base 3.10 %
+              {{ store.meta?.aperturas_bt ?? 0 }} aperturas reales entre {{ nf.format(store.meta?.candidatos_bt ?? 0) }} candidatos ·
+              tasa base {{ ((store.meta?.aperturas_bt ?? 0) / (store.meta?.candidatos_bt || 1) * 100).toFixed(2) }} %
             </VCardSubtitle>
           </VCardItem>
           <VCardText class="pt-0">
@@ -272,9 +274,9 @@ const limitaciones = [
             </VTable>
             <p class="nota">
               El ensamble ubicó <strong>{{ store.kpis.aciertos20 }} de las 39 aperturas reales</strong> en
-              su Top-20, igual que el mejor baseline, pero concentra
-              {{ store.kpis.lift.toFixed(2) }} veces más aperturas que el azar en su
-              decil superior. Es un resultado modesto y realista dadas las condiciones:
+              su Top-20 y concentra {{ store.kpis.lift.toFixed(2) }} veces más aperturas que el
+              azar en su decil superior; su ventaja sobre el mejor baseline no es
+              estadísticamente significativa. Es un resultado modesto y realista dadas las condiciones:
               83 casos de entrenamiento y ausencia de variables de alquiler y
               disponibilidad de locales. Un resultado de 18 sobre 20 debería
               despertar sospecha de fuga de información, no confianza.

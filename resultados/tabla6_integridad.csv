@@ -9,3 +9,5 @@ Independencia de las particiones espaciales,Ningun bloque H3 r6 aparece en entre
 Comparacion contra lineas base univariadas,El backtesting evalua los 4 modelos y las 3 lineas base,7 modelos evaluados,Si
 Exclusion de locales de la cadena en la competencia OSM,Ningun competidor OSM coincide por nombre o a menos de 50 m con un local de la cadena,"2024: 154 competidores, 0 coincidencias; 2026: 169 competidores, 0 coincidencias",Si
 Corte temporal de los predictores del backtesting,Los predictores del backtesting provienen de capas OSM con fecha <= 2024-12-31,capas OSM al 2024-12-31; 154 competidores en la matriz de 2024,Si
+Conservacion del crecimiento censal en la actualizacion de la poblacion,El reparto por edificaciones reproduce el crecimiento 2017-2025 de cada distrito (diferencia < 0.01 %),16 distritos que crecen: diferencia maxima 0.0000 %; 1 que decrecen: diferencia 0.0000 %,Si
+Fecha de la poblacion en los predictores,El ranking usa la poblacion 2025 y el backtesting la poblacion al 31-12-2024,diferencia maxima: 0.0e+00 hab. (2025) y 0.0e+00 hab. (2024),Si

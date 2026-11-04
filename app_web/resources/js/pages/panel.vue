@@ -26,6 +26,15 @@ function hexToRgb(hex) {
   return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`
 }
 
+// Distritos con más ubicaciones en el Top-50 (texto del hallazgo principal)
+const titulo = s => s.toLowerCase().replace(/(^|\s)\S/g, ch => ch.toUpperCase())
+const lideres = computed(() => {
+  const t = store.topPorDistrito.slice(0, 3)
+
+  return { nombres: t.map(d => titulo(d.distrito)), total: t.reduce((s, d) => s + d.n, 0) }
+})
+const separador = i => (i === lideres.value.nombres.length - 2 ? ' y ' : (i === lideres.value.nombres.length - 1 ? '' : ', '))
+
 // ── Top-50 por distrito ──────────────────────────────────────────────────────
 const distSerie = computed(() => [{
   name: 'Ubicaciones en el Top-50',
@@ -62,7 +71,7 @@ const dispersion = computed(() => {
   store.hexesCalculados.forEach(h => {
     if (!porDist[h.dist])
       porDist[h.dist] = { pob: 0, mass: 0 }
-    porDist[h.dist].pob += h.pob_2017
+    porDist[h.dist].pob += h.pob
     porDist[h.dist].mass += h.mass_2026
   })
 
@@ -143,7 +152,7 @@ const apertOpts = computed(() => ({
           Localización óptima de minimarkets
         </h1>
         <p class="page-sub">
-          Arequipa Metropolitana · malla H3 resolución 9 · Censo INEI 2017 ·
+          Arequipa Metropolitana · malla H3 resolución 9 · Censos INEI 2017 y 2025 ·
           OpenStreetMap · Internet Archive
         </p>
       </div>
@@ -188,7 +197,7 @@ const apertOpts = computed(() => ({
       <VCol cols="6" md="4" lg="2">
         <KpiTile
           label="Población" :value="(kpis.poblacion / 1e6).toFixed(2)" suffix="M"
-          icon="bx-group" color="info" hint="Censo 2017 a manzana"
+          icon="bx-group" color="info" hint="Censo 2017 actualizado a 2025"
         />
       </VCol>
       <VCol cols="6" md="4" lg="2">
@@ -227,9 +236,10 @@ const apertOpts = computed(() => ({
               corredores viales principales. Al penalizar la cercanía de un
               hard discount —contra el que un independiente no puede competir en
               precio— la prioridad se desplaza hacia la periferia densa:
-              <strong>Miraflores</strong>, <strong>Jacobo Hunter</strong>,
-              <strong>Socabaya</strong> y <strong>Cerro Colorado</strong>
-              concentran 33 de las 50 mejores ubicaciones.
+              <template v-for="(d, i) in lideres.nombres" :key="d">
+                <strong>{{ d }}</strong>{{ separador(i) }}
+              </template>
+              concentran {{ lideres.total }} de las 50 mejores ubicaciones.
             </p>
 
             <div class="d-flex flex-wrap gap-6">

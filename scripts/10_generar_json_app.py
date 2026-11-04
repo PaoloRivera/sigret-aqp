@@ -10,7 +10,8 @@ Uso (desde la raiz del proyecto, tras ejecutar pipeline.py):
     python scripts/10_generar_json_app.py
 
 Salidas (en app_web/public/data/):
-    hexes.json         3,717 celdas x 25 columnas, formato de matriz
+    hexes.json         3,717 celdas x 25 columnas, formato de matriz (26 con
+                       el conteo de campo: bod_k1, de scripts/15_calibrar_bodegas.py)
     mass.json          panel de tiendas con anio de apertura
     competencia.json   comercios de OpenStreetMap
     meta.json          backtesting, validacion cruzada, importancias, fuentes
@@ -19,7 +20,6 @@ import json
 import os
 import sys
 
-import glob
 from datetime import date
 
 import geopandas as gpd
@@ -29,18 +29,21 @@ import pandas as pd
 RES = "resultados"
 DESTINO = "app_web/public/data"
 
-COLS = ["h3", "dist", "lat", "lon", "pob_2017", "pob_k1", "pob_k2",
+COLS = ["h3", "dist", "lat", "lon", "pob", "pob_k1", "pob_k2",
         "dens_hab_km2", "n_comp_osm_k1", "mass_k1_2026", "d_mass_2026",
         "n_poi_k1", "n_colegio_k1", "n_salud_k1", "n_mercado_k1",
         "n_comida_k1", "n_transp_k1", "n_banco_k1", "dens_intersec_km2",
         "long_princ_m", "p_potencial", "dem_res_n", "area_km2", "n_mz", "mass_2026"]
+
+# Columna de resultado_final.parquet de la que sale cada columna del JSON
+ORIGEN = {"pob": "pob_celda"}
 
 # Coordenadas a 5 decimales (~1 m), indices a 4 y conteos, poblaciones y
 # distancias a enteros, para mantener el JSON liviano
 DECIMALES = {"lat": 5, "lon": 5, "p_potencial": 4, "dem_res_n": 4, "area_km2": 4}
 
 ETIQUETAS = {
-    "pob_2017": "Población del hexágono", "dens_hab_km2": "Densidad poblacional",
+    "pob_celda": "Población del hexágono", "dens_hab_km2": "Densidad poblacional",
     "pob_k1": "Población a 500 m", "pob_k1_ext": "Población anillo externo",
     "pob_k2": "Población a 800 m", "pob_k3": "Población a 1.1 km",
     "n_poi_k1": "POIs de flujo (500 m)", "n_colegio_k1": "Colegios a 500 m",
@@ -57,6 +60,10 @@ ETIQUETAS = {
 FUENTES = [
     {"n": "Censo Nacional INEI 2017", "t": "Manzanas con población",
      "v": "21 705 manzanas · 1 018 031 hab", "l": "Cartografía censal · uso público"},
+    {"n": "Censo Nacional INEI 2025", "t": "Población censada por distrito",
+     "v": "17 distritos · 1 222 998 hab", "l": "Resultados oficiales · uso público"},
+    {"n": "Google Open Buildings 2.5D Temporal", "t": "Edificaciones detectadas por satélite",
+     "v": "Capas 2017 y 2023 · reparto del crecimiento", "l": "CC BY 4.0 · Google Research"},
     {"n": "OpenStreetMap", "t": "Competencia y puntos de interés",
      "v": "182 comercios · 3 072 POIs", "l": "ODbL · © colaboradores de OpenStreetMap"},
     {"n": "OpenStreetMap", "t": "Red vial caminable",
@@ -87,15 +94,29 @@ R["DIST"] = R["DIST"].fillna("SIN_DATO").astype(str)
 districts = sorted(R["DIST"].unique().tolist())
 idx = {d: i for i, d in enumerate(districts)}
 
-faltan = [c for c in COLS if c not in ("h3", "dist") and c not in R.columns]
+faltan = [c for c in COLS if c not in ("h3", "dist") and ORIGEN.get(c, c) not in R.columns]
 if faltan:
     salir(f"Columnas ausentes en resultado_final.parquet: {faltan}")
+
+# Conteo de campo (Anexo K): si existe, cada celda lleva las bodegas estimadas
+# en su area de captacion con la ecuacion 1 calibrada, y el simulador las usa
+CAMPO = f"{RES}/campo/bodegas_k1_calibradas.parquet"
+H_CAMPO = f"{RES}/campo/h_calibrado.json"
+campo = None
+if os.path.exists(CAMPO) and os.path.exists(H_CAMPO):
+    R = R.merge(pd.read_parquet(CAMPO)[["h3", "bod_k1"]], on="h3", how="left")
+    COLS.append("bod_k1")
+    DECIMALES["bod_k1"] = 2
+    hc = json.load(open(H_CAMPO, encoding="utf-8"))
+    campo = {"h": hc["h"], "h_ic": hc["h_ic"], "variante": hc["variante"], "celdas": hc["celdas"],
+             "establecimientos": hc["establecimientos"], "fecha": hc["fecha"]}
+    print(f"    con el conteo de campo: h = {hc['h']} ({hc['variante']})")
 
 rows = []
 for r in R.itertuples():
     fila = [r.h3, idx[r.DIST]]
     for c in COLS[2:]:
-        v = getattr(r, c)
+        v = getattr(r, ORIGEN.get(c, c))
         v = 0.0 if pd.isna(v) else float(v)
         fila.append(round(v, DECIMALES.get(c, 0)))
     rows.append(fila)
@@ -157,7 +178,7 @@ print("    top 3:", ", ".join(f"{d['v']} {d['i']:.4f}" for d in importancias[:3]
 aperturas = M["anio_apertura"].value_counts().sort_index().to_dict()
 aperturas = {str(int(k)): int(v) for k, v in aperturas.items()}
 
-# Poblacion censal por distrito (total de manzanas por UBIGEO)
+# Poblacion censada 2025 por distrito (INEI, 2026)
 UBIGEOS = {
     "040101": "AREQUIPA", "040102": "ALTO SELVA ALEGRE", "040103": "CAYMA",
     "040104": "CERRO COLORADO", "040105": "CHARACATO", "040107": "JACOBO HUNTER",
@@ -166,8 +187,8 @@ UBIGEOS = {
     "040123": "TIABAYA", "040124": "UCHUMAYO", "040126": "YANAHUARA",
     "040128": "YURA", "040129": "JLBR",
 }
-mz = gpd.read_file(glob.glob("data/inei/*Manzanas_Poblacion*.dbf")[0], ignore_geometry=True)
-pobd = (mz.groupby(mz["UBIGEO"].map(UBIGEOS))["T_TOTAL"].sum()
+cen = pd.read_csv("data/inei/poblacion_censada_distritos.csv", dtype={"ubigeo": str})
+pobd = (cen.set_index(cen["ubigeo"].map(UBIGEOS))["pob_2025_censada"]
         .sort_values(ascending=False))
 poblacion_distrito = [{"d": k, "p": int(round(v))} for k, v in pobd.items()]
 
@@ -175,9 +196,15 @@ poblacion_distrito = [{"d": k, "p": int(round(v))} for k, v in pobd.items()]
 F = pd.read_parquet(f"{RES}/features.parquet", columns=["mass_2026"])
 tasa_base_cv = round(float((F["mass_2026"] > 0).mean()), 4)
 
+# Candidatos y aperturas del backtesting (para la vista de validacion)
+P = pd.read_parquet(f"{RES}/predicciones_backtesting.parquet", columns=["abrio"])
+candidatos_bt, aperturas_bt = len(P), int(P["abrio"].sum())
+
 json.dump({"generado": date.today().isoformat(), "backtesting": backtesting, "cv_espacial": cv, "tasa_base_cv": tasa_base_cv,
+           "candidatos_bt": candidatos_bt, "aperturas_bt": aperturas_bt,
            "importancias": importancias, "aperturas": aperturas,
-           "poblacion_distrito": poblacion_distrito, "fuentes": FUENTES},
+           "poblacion_distrito": poblacion_distrito, "fuentes": FUENTES,
+           **({"campo": campo} if campo else {})},
           open(f"{DESTINO}/meta.json", "w", encoding="utf-8"),
           ensure_ascii=False, separators=(",", ":"))
 print(f"    aperturas por año: {aperturas}")

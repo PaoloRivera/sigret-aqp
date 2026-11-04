@@ -4,7 +4,7 @@
       SIGRET-AQP · Tesis de Ingeniería de Sistemas · Universidad Católica de Santa María · 2026
     </span>
     <span class="d-none d-md-flex">
-      Datos: INEI Censo 2017 · © colaboradores de OpenStreetMap
+      Datos: INEI Censos 2017 y 2025 · Google Open Buildings · © colaboradores de OpenStreetMap
     </span>
   </div>
 </template>

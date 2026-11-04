@@ -117,6 +117,9 @@ const capas = defineModel('capas', {
         <p class="ctrl-help">
           Densidad de oferta informal estimada. OpenStreetMap no registra la
           mayoría de bodegas; se usa el máximo entre estimadas y registradas.
+          <template v-if="store.p.hCampo">
+            Valor inicial calibrado con el conteo de campo (Anexo K).
+          </template>
         </p>
       </div>
 

@@ -1,0 +1,94 @@
+Poblacion: 2017 | salida: resultados/base_censo2017
+[1] Malla H3 y poblacion censal
+    manzanas: 21,705 | poblacion: 1,018,031
+    hexagonos: 3,717 | poblacion repartida: 1,018,031
+[2] Red historica de tiendas Mass
+    snapshot 2024: 86 tiendas
+    snapshot 2025: 118 tiendas
+    snapshot 2026: 126 tiendas
+    snapshot actual: 136 tiendas
+    tiendas unicas: 127 | hexagonos: 124
+    aperturas por anio:
+anio_apertura
+2024    86
+2025    32
+2026     9
+[3] Ingenieria de features (capas OSM: data/osm)
+    competencia OSM (2026): 182 | excluidos por cadena: 13 (nombre 8, < 50 m 8)
+    matriz: 3,717 hexagonos x 52 columnas
+[3] Ingenieria de features (capas OSM: data/osm_2024)
+    competencia OSM (2024): 158 | excluidos por cadena: 4 (nombre 2, < 50 m 3)
+    matriz: 3,717 hexagonos x 52 columnas
+[4] Entrenamiento y validacion
+    candidatos viables sin Mass en 2024: 1,259
+    aperturas reales 2025-26: 39 (3.10%)
+
+    --- Backtesting temporal ---
+             modelo  PR_AUC  ROC_AUC  P@20  Lift@10%  acierto@20
+  Baseline densidad   0.080    0.787  0.05     2.066           1
+   Baseline pob. k1   0.092    0.754  0.15     3.099           3
+   Baseline POIs k1   0.061    0.683  0.05     2.324           1
+Regresion logistica   0.089    0.792  0.05     3.099           1
+      Random Forest   0.103    0.791  0.10     3.616           2
+            XGBoost   0.117    0.797  0.15     4.132           3
+Ensamble (rank avg)   0.117    0.809  0.20     4.907           4
+
+    --- Validacion cruzada espacial (52 bloques H3 r6) ---
+    LR    PR-AUC 0.202   ROC-AUC 0.865
+    RF    PR-AUC 0.228   ROC-AUC 0.929
+    XGB   PR-AUC 0.259   ROC-AUC 0.921
+    ENS   PR-AUC 0.255   ROC-AUC 0.917
+
+    Top 10 variables:
+    pob_celda            0.1625
+    dens_hab_km2         0.1553
+    pob_k1               0.0808
+    pob_k1_ext           0.0782
+    n_poi_k1             0.0603
+    n_colegio_k1         0.0514
+    pob_k2               0.0495
+    n_mz                 0.0435
+    dens_intersec_km2    0.0365
+    long_princ_m         0.0350
+[5] Score y ranking
+
+    --- TOP 20 UBICACIONES ---
+          DIST   pob_k1  n_comp_osm_k1  d_mass_2026  p_potencial  SCORE     lat     lon
+    MIRAFLORES 7606.130            0.0      773.695        0.939  0.974 -16.375 -71.504
+         CAYMA 6577.283            0.0      738.506        0.957  0.973 -16.353 -71.543
+CERRO COLORADO 7198.591            0.0      789.194        0.939  0.973 -16.350 -71.558
+ JACOBO HUNTER 7846.249            0.0      852.439        0.926  0.970 -16.457 -71.555
+    MIRAFLORES 9553.164            0.0      890.290        0.913  0.968 -16.380 -71.507
+CERRO COLORADO 7229.593            0.0      974.340        0.913  0.965 -16.347 -71.558
+         CAYMA 9576.434            0.0      776.310        0.903  0.964 -16.347 -71.552
+ JACOBO HUNTER 4096.911            0.0     1214.624        0.954  0.964 -16.461 -71.555
+ JACOBO HUNTER 8629.352            0.0      832.691        0.895  0.961 -16.450 -71.560
+ JACOBO HUNTER 8593.698            0.0      828.243        0.893  0.959 -16.456 -71.557
+    MIRAFLORES 6950.614            0.0      793.337        0.891  0.956 -16.383 -71.507
+         CAYMA 8392.589            0.0      731.865        0.893  0.953 -16.349 -71.555
+      SOCABAYA 5609.174            0.0     1311.995        0.893  0.951 -16.461 -71.522
+CERRO COLORADO 3908.762            0.0      946.779        0.918  0.950 -16.375 -71.569
+    MIRAFLORES 9177.281            0.0      661.825        0.948  0.950 -16.376 -71.507
+    MIRAFLORES 5847.146            0.0     1143.294        0.874  0.946 -16.382 -71.504
+    MIRAFLORES 6654.144            0.0     1015.427        0.857  0.943 -16.373 -71.500
+         CAYMA 3933.040            0.0      738.230        0.907  0.943 -16.366 -71.544
+      SOCABAYA 5047.236            0.0      813.085        0.872  0.942 -16.453 -71.539
+          YURA 3842.462            0.0     1119.683        0.900  0.942 -16.315 -71.602
+
+    Top-50 por distrito:
+    DIST
+    MIRAFLORES           9
+    JACOBO HUNTER        9
+    SOCABAYA             8
+    CERRO COLORADO       7
+    CAYMA                6
+    PAUCARPATA           3
+    MARIANO MELGAR       2
+    TIABAYA              2
+    UCHUMAYO             2
+    YURA                 1
+    ALTO SELVA ALEGRE    1
+
+=== PIPELINE COMPLETO ===
+  en resultados/base_censo2017/: grid.parquet · features.parquet · resultado_final.parquet
+  features_2024.parquet · resultados_backtesting.csv · resultados_cv.csv · importancia_variables.csv

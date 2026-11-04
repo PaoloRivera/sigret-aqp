@@ -138,8 +138,12 @@ const alertas = computed(() => {
   }
   a.push({
     t: 'info',
-    txt: `Oferta informal estimada: ${Math.round(huff.value.bodegas)} bodegas `
-      + `(1 cada ${store.p.habPorBodega} habitantes).`,
+    txt: store.p.hCampo
+      ? `Oferta informal estimada: ${Math.round(huff.value.bodegas)} bodegas con el conteo `
+        + `de campo (1 cada ${Math.round(h.value.pob_k1 / Math.max(huff.value.bodegas, 1))} `
+        + 'habitantes en esta área).'
+      : `Oferta informal estimada: ${Math.round(huff.value.bodegas)} bodegas `
+        + `(1 cada ${store.p.habPorBodega} habitantes).`,
   })
   if (h.value.pob_k1 < 2500) {
     a.push({

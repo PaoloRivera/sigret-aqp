@@ -17,6 +17,7 @@ numpy==2.2.5
 pandas==2.2.3
 scipy==1.17.1
 pyarrow==19.0.1
+openpyxl==3.1.5        # formulario y exportacion de KoboToolbox (Anexo K)
 
 # Aprendizaje automático
 scikit-learn==1.9.0
