@@ -1,5 +1,5 @@
-== 1/14 Corrida de comparacion con la poblacion del Censo 2017
-== 2/14 Modelo principal (poblacion actualizada al Censo 2025)
+== 1/15 Corrida de comparacion con la poblacion del Censo 2017
+== 2/15 Modelo principal (poblacion actualizada al Censo 2025)
 Poblacion: 2025 | salida: resultados
 [1] Malla H3 y poblacion censal
     manzanas: 21,705 | poblacion: 1,018,031
@@ -96,7 +96,7 @@ MARIANO MELGAR  5466.362            0.0      926.641        0.888  0.945 -16.392
 === PIPELINE COMPLETO ===
   en resultados/: grid.parquet · features.parquet · resultado_final.parquet
   features_2024.parquet · resultados_backtesting.csv · resultados_cv.csv · importancia_variables.csv
-== 3/14 Comparacion entre ambas poblaciones
+== 3/15 Comparacion entre ambas poblaciones
 === Modelo principal frente a la poblacion 2017 ===
 corrida                 Poblacion Censo 2017  Poblacion actualizada (Censo 2025)
 poblacion_malla                 1.018031e+06                        1.210286e+06
@@ -138,7 +138,7 @@ JLBR                                  0                                   1
 YURA                                  1                                   1
 TIABAYA                               2                                   0
 UCHUMAYO                              2                                   0
-== 4/14 Integridad (Tabla 7)
+== 4/15 Integridad (Tabla 7)
                                                            Verificacion                                                                              Condicion de cumplimiento                                                                          Valor observado Se cumple
                    Conservacion de la poblacion en la ponderacion areal                                        Diferencia entre poblacion censal y poblacion repartida < 0.5 %                                                         1,018,031 vs 1,018,031 (0.000 %)        Si
                                      Cobertura de manzanas por la malla                                                      Ninguna manzana censal queda fuera de la malla H3                                                            0 manzanas sin celda asignada        Si
@@ -154,7 +154,7 @@ Conservacion del crecimiento censal en la actualizacion de la poblacion El repar
                                Fecha de la poblacion en los predictores                           El ranking usa la poblacion 2025 y el backtesting la poblacion al 31-12-2024                             diferencia maxima: 0.0e+00 hab. (2025) y 0.0e+00 hab. (2024)        Si
 
 >> tabla6_integridad.csv generada
-== 5/14 Sensibilidad (Tabla 16, Figura 25)
+== 5/15 Sensibilidad (Tabla 16, Figura 25)
 parametro      Penalización hard discount  Peso del perfil de sitio  Radio de amenaza  Umbral de población
 variacion_pct                                                                                             
 -20                                   0.9                       1.0               0.4                  1.0
@@ -171,7 +171,7 @@ Permanencia minima observada: 30%
 Criterio (>= 70%): NO CUMPLE
 
 >> figura25_sensibilidad_ranking.png y tabla_sensibilidad.csv generadas
-== 6/14 Robustez de los parametros del score
+== 6/15 Robustez de los parametros del score
                      escenario     w   pen  radio  spearman_viables  top10_compartido_pct  top20_compartido_pct  top50_compartido_pct
   Provisional del investigador 0.450 0.600    800             0.946                   0.7                  0.90                  0.70
 Sin segunda ronda, radio 750 m 0.298 0.275    750             0.997                   1.0                  0.95                  0.92
@@ -198,14 +198,14 @@ Provisional -20                     0.9                       1.0               
              10                     1.0                       0.9               0.5                  1.0
              15                     1.0                       0.9               0.4                  1.0
              20                     1.0                       0.9               0.3                  1.0
-== 7/14 Figuras del Capitulo IV
+== 7/15 Figuras del Capitulo IV
 Con fuga: d_mass_2024 0.316, mass_k1_2024 0.183 = 49.8% de la importancia | backtesting ROC-AUC 0.743, P@20 0.10 (2 aciertos)
 Sin fuga: principal pob_celda 0.140 | backtesting ROC-AUC 0.831, P@20 0.15 (3 aciertos)
   >> figura16_importancia_fuga.png
   >> figura17_consola_entrenamiento.png
   >> figura18_curvas_roc_pr.png
   >> anexo_i_poblacion_2025.png
-== 8/14 Figuras del Capitulo V
+== 8/15 Figuras del Capitulo V
   >> figura20_importancia_variables.png
   >> figura21_comparacion_modelos.png
   >> figura23_distribucion_territorial.png
@@ -216,7 +216,7 @@ Sin fuga: principal pob_celda 0.140 | backtesting ROC-AUC 0.831, P@20 0.15 (3 ac
   >> figura22_desempeno_validaciones.png
 
 Ocho figuras generadas.
-== 9/14 Analisis complementarios
+== 9/15 Analisis complementarios
 [1] Fuga temporal: backtesting con tres versiones de los predictores OSM
                                            escenario  PR_AUC  ROC_AUC  Lift@10%  aciertos@20
                       OSM 2026 sin filtrar la cadena   0.113    0.824     4.377            4
@@ -299,14 +299,143 @@ Celdas viables del ranking 1462           0.876
 Todas las celdas viables en 2024 1486                                  450         0.303                           39
 
 >> resultados/analisis_*.csv generados
-== 10/14 IC de la validacion espacial
+== 10/15 IC de la validacion espacial
 Bloques: 52 | remuestreos validos: 1000
 modelo  ROC_AUC  IC95_inf  IC95_sup  IC_supera_0.85
     LR    0.864     0.791     0.960           False
     RF    0.932     0.897     0.965            True
    XGB    0.921     0.881     0.965            True
    ENS    0.917     0.869     0.969            True
-== 11/14 Simulador con h = 120 (Tablas 6 y 13, Anexo J)
+== 11/15 Eleccion del modelo: pruebas formales y estabilidad (unos 7 min)
+[     0 s] 3,717 celdas, 122 con tienda en 2026; backtesting: 1,486 candidatos, 39 aperturas; 1,462 celdas viables
+[     0 s] [1] Pruebas formales del ensamble frente a cada modelo y cada baseline
+[     6 s]     control IC del backtesting frente a analisis_diferencias_backtesting.csv: diferencia maxima 7.6e-17 -> coincide
+[    13 s]     remuestreos validos: backtesting 1000, espacial 1000 (de 52 bloques)
+ validacion  metrica                        metodo                    comparacion  ensamble   otro  diferencia  IC95_inf  IC95_sup      p  p_holm
+backtesting  ROC_AUC                        DeLong Ensamble - Regresion logistica    0.8309 0.8166      0.0143   -0.0175    0.0461 0.3776  1.0000
+backtesting  ROC_AUC             bootstrap pareado Ensamble - Regresion logistica    0.8309 0.8166      0.0143   -0.0198    0.0451 0.4140  1.0000
+backtesting   PR_AUC             bootstrap pareado Ensamble - Regresion logistica    0.1106 0.0888      0.0218   -0.0107    0.0718 0.1900  0.7900
+backtesting Lift@10%             bootstrap pareado Ensamble - Regresion logistica    4.3766 3.6043      0.7723   -1.2188    2.3433 0.6740  1.0000
+backtesting  ROC_AUC                        DeLong       Ensamble - Random Forest    0.8309 0.8249      0.0060   -0.0135    0.0255 0.5452  1.0000
+backtesting  ROC_AUC             bootstrap pareado       Ensamble - Random Forest    0.8309 0.8249      0.0060   -0.0125    0.0249 0.5400  1.0000
+backtesting   PR_AUC             bootstrap pareado       Ensamble - Random Forest    0.1106 0.0928      0.0178   -0.0068    0.0650 0.1580  0.7900
+backtesting Lift@10%             bootstrap pareado       Ensamble - Random Forest    4.3766 4.1192      0.2574   -0.7176    1.1960 0.8580  1.0000
+backtesting  ROC_AUC                        DeLong             Ensamble - XGBoost    0.8309 0.8080      0.0229   -0.0018    0.0476 0.0694  0.3471
+backtesting  ROC_AUC             bootstrap pareado             Ensamble - XGBoost    0.8309 0.8080      0.0229   -0.0004    0.0495 0.0560  0.2800
+backtesting   PR_AUC             bootstrap pareado             Ensamble - XGBoost    0.1106 0.1017      0.0090   -0.0321    0.0537 0.6280  1.0000
+backtesting Lift@10%             bootstrap pareado             Ensamble - XGBoost    4.3766 4.1192      0.2574    0.0000    1.1156 0.5260  1.0000
+backtesting  ROC_AUC                        DeLong   Ensamble - Baseline densidad    0.8309 0.8124      0.0185   -0.0289    0.0659 0.4439  1.0000
+backtesting  ROC_AUC             bootstrap pareado   Ensamble - Baseline densidad    0.8309 0.8124      0.0185   -0.0320    0.0656 0.4380  1.0000
+backtesting   PR_AUC             bootstrap pareado   Ensamble - Baseline densidad    0.1106 0.0836      0.0271   -0.0497    0.1022 0.4120  1.0000
+backtesting Lift@10%             bootstrap pareado   Ensamble - Baseline densidad    4.3766 2.8319      1.5447   -0.6478    3.6734 0.1860  0.9720
+backtesting  ROC_AUC                        DeLong    Ensamble - Baseline pob. k1    0.8309 0.7901      0.0408   -0.0197    0.1013 0.1862  0.7450
+backtesting  ROC_AUC             bootstrap pareado    Ensamble - Baseline pob. k1    0.8309 0.7901      0.0408   -0.0205    0.0996 0.1960  0.7840
+backtesting   PR_AUC             bootstrap pareado    Ensamble - Baseline pob. k1    0.1106 0.0980      0.0127   -0.0804    0.0930 0.7280  1.0000
+backtesting Lift@10%             bootstrap pareado    Ensamble - Baseline pob. k1    4.3766 3.0894      1.2872   -0.7729    3.1707 0.2980  1.0000
+backtesting  ROC_AUC                        DeLong    Ensamble - Baseline POIs k1    0.8309 0.7279      0.1030    0.0376    0.1683 0.0020  0.0121
+backtesting  ROC_AUC             bootstrap pareado    Ensamble - Baseline POIs k1    0.8309 0.7279      0.1030    0.0396    0.1723 0.0060  0.0360
+backtesting   PR_AUC             bootstrap pareado    Ensamble - Baseline POIs k1    0.1106 0.0602      0.0505   -0.0059    0.1283 0.0700  0.4200
+backtesting Lift@10%             bootstrap pareado    Ensamble - Baseline POIs k1    4.3766 2.8319      1.5447   -0.4898    3.5437 0.1620  0.9720
+   espacial  ROC_AUC                        DeLong Ensamble - Regresion logistica    0.9171 0.8636      0.0535    0.0249    0.0822 0.0003  0.0015
+   espacial  ROC_AUC bootstrap pareado por bloques Ensamble - Regresion logistica    0.9171 0.8636      0.0535    0.0039    0.0874 0.0040  0.0240
+   espacial   PR_AUC bootstrap pareado por bloques Ensamble - Regresion logistica    0.2614 0.2083      0.0531    0.0078    0.0684 0.0280  0.0960
+   espacial Lift@10% bootstrap pareado por bloques Ensamble - Regresion logistica    6.4055 6.0770      0.3285   -0.4620    1.0891 0.3700  1.0000
+   espacial  ROC_AUC                        DeLong       Ensamble - Random Forest    0.9171 0.9316     -0.0144   -0.0269   -0.0020 0.0226  0.1132
+   espacial  ROC_AUC bootstrap pareado por bloques       Ensamble - Random Forest    0.9171 0.9316     -0.0144   -0.0283    0.0040 0.6180  1.0000
+   espacial   PR_AUC bootstrap pareado por bloques       Ensamble - Random Forest    0.2614 0.2374      0.0240    0.0004    0.0513 0.0460  0.0960
+   espacial Lift@10% bootstrap pareado por bloques       Ensamble - Random Forest    6.4055 6.4876     -0.0821   -0.7225    0.6352 1.0000  1.0000
+   espacial  ROC_AUC                        DeLong             Ensamble - XGBoost    0.9171 0.9214     -0.0043   -0.0179    0.0094 0.5387  1.0000
+   espacial  ROC_AUC bootstrap pareado por bloques             Ensamble - XGBoost    0.9171 0.9214     -0.0043   -0.0153    0.0103 0.7100  1.0000
+   espacial   PR_AUC bootstrap pareado por bloques             Ensamble - XGBoost    0.2614 0.2582      0.0032   -0.0202    0.0425 0.8000  0.8000
+   espacial Lift@10% bootstrap pareado por bloques             Ensamble - XGBoost    6.4055 6.2413      0.1642   -0.4546    0.9766 0.8960  1.0000
+   espacial  ROC_AUC                        DeLong   Ensamble - Baseline densidad    0.9171 0.9219     -0.0048   -0.0191    0.0095 0.5102  1.0000
+   espacial  ROC_AUC bootstrap pareado por bloques   Ensamble - Baseline densidad    0.9171 0.9219     -0.0048   -0.0225    0.0239 0.8280  1.0000
+   espacial   PR_AUC bootstrap pareado por bloques   Ensamble - Baseline densidad    0.2614 0.2050      0.0564    0.0050    0.0845 0.0240  0.0960
+   espacial Lift@10% bootstrap pareado por bloques   Ensamble - Baseline densidad    6.4055 6.4055      0.0000   -0.6261    1.1390 0.9940  1.0000
+   espacial  ROC_AUC                        DeLong    Ensamble - Baseline pob. k1    0.9171 0.9092      0.0079   -0.0089    0.0247 0.3573  1.0000
+   espacial  ROC_AUC bootstrap pareado por bloques    Ensamble - Baseline pob. k1    0.9171 0.9092      0.0079   -0.0157    0.0428 0.5380  1.0000
+   espacial   PR_AUC bootstrap pareado por bloques    Ensamble - Baseline pob. k1    0.2614 0.2041      0.0573    0.0226    0.1321 0.0000  0.0000
+   espacial Lift@10% bootstrap pareado por bloques    Ensamble - Baseline pob. k1    6.4055 5.5843      0.8212   -0.3817    2.4285 0.2880  1.0000
+   espacial  ROC_AUC                        DeLong    Ensamble - Baseline POIs k1    0.9171 0.9040      0.0131   -0.0077    0.0339 0.2171  0.8683
+   espacial  ROC_AUC bootstrap pareado por bloques    Ensamble - Baseline POIs k1    0.9171 0.9040      0.0131   -0.0006    0.0428 0.0640  0.3200
+   espacial   PR_AUC bootstrap pareado por bloques    Ensamble - Baseline POIs k1    0.2614 0.1734      0.0880    0.0417    0.1173 0.0000  0.0000
+   espacial Lift@10% bootstrap pareado por bloques    Ensamble - Baseline POIs k1    6.4055 5.5022      0.9033    0.1019    2.0856 0.0440  0.2640
+[    13 s] [2a] Estabilidad entre los cinco pliegues de la validacion espacial
+metrica modelo  media     de  cv_pct  minimo  maximo  puesto_medio  mejor_puesto  peor_puesto  veces_ultimo  distancia_media_al_mejor  distancia_max_al_mejor  friedman_chi2  friedman_p
+ROC_AUC     LR 0.9001 0.0864  9.6038  0.7471  0.9575           3.2             1            4             3                    0.0321                  0.1107           3.48      0.3234
+ROC_AUC     RF 0.9278 0.0419  4.5114  0.8578  0.9688           1.8             1            3             0                    0.0044                  0.0113           3.48      0.3234
+ROC_AUC    XGB 0.9208 0.0460  4.9939  0.8436  0.9587           2.8             1            4             2                    0.0114                  0.0193           3.48      0.3234
+ROC_AUC    ENS 0.9257 0.0507  5.4727  0.8383  0.9666           2.2             2            3             0                    0.0066                  0.0195           3.48      0.3234
+ PR_AUC     LR 0.2369 0.0547 23.0910  0.1535  0.3039           3.0             1            4             2                    0.0360                  0.0841           1.56      0.6685
+ PR_AUC     RF 0.2268 0.0459 20.2363  0.1920  0.2913           2.6             1            4             2                    0.0461                  0.1105           1.56      0.6685
+ PR_AUC    XGB 0.2508 0.0699 27.8549  0.1301  0.3009           2.4             1            4             1                    0.0221                  0.0619           1.56      0.6685
+ PR_AUC    ENS 0.2598 0.0496 19.0814  0.1842  0.3147           2.0             1            3             0                    0.0131                  0.0554           1.56      0.6685
+[    13 s] [2b] Semilla de referencia (42) y control frente a pipeline.py
+[    21 s]     control backtesting LR: diferencia maxima 0.0e+00 -> coincide
+[    21 s]     control backtesting RF: diferencia maxima 1.1e-16 -> coincide
+[    21 s]     control backtesting XGB: diferencia maxima 0.0e+00 -> coincide
+[    21 s]     control backtesting ENS: diferencia maxima 0.0e+00 -> coincide
+[    21 s]     control validacion espacial LR: diferencia maxima 0.0e+00 -> coincide
+[    21 s]     control validacion espacial RF: diferencia maxima 2.2e-16 -> coincide
+[    21 s]     control validacion espacial XGB: diferencia maxima 0.0e+00 -> coincide
+[    21 s]     control validacion espacial ENS: diferencia maxima 0.0e+00 -> coincide
+[    21 s]     control perfil del ensamble (p_potencial): diferencia maxima 0.0e+00 -> coincide
+[    21 s]     control score de la aplicacion: diferencia maxima 0.0e+00 -> coincide
+[    21 s] [2b] 20 semillas (1 a 20)
+[    28 s]     semilla  1: backtesting ROC-AUC LR 0.817 RF 0.829 XGB 0.814 ENS 0.835
+[    35 s]     semilla  2: backtesting ROC-AUC LR 0.817 RF 0.824 XGB 0.812 ENS 0.832
+[    43 s]     semilla  3: backtesting ROC-AUC LR 0.817 RF 0.830 XGB 0.812 ENS 0.833
+[    51 s]     semilla  4: backtesting ROC-AUC LR 0.817 RF 0.829 XGB 0.802 ENS 0.831
+[    58 s]     semilla  5: backtesting ROC-AUC LR 0.817 RF 0.833 XGB 0.810 ENS 0.834
+[    65 s]     semilla  6: backtesting ROC-AUC LR 0.817 RF 0.828 XGB 0.800 ENS 0.829
+[    72 s]     semilla  7: backtesting ROC-AUC LR 0.817 RF 0.828 XGB 0.811 ENS 0.832
+[    80 s]     semilla  8: backtesting ROC-AUC LR 0.817 RF 0.832 XGB 0.812 ENS 0.833
+[    87 s]     semilla  9: backtesting ROC-AUC LR 0.817 RF 0.830 XGB 0.810 ENS 0.833
+[    94 s]     semilla 10: backtesting ROC-AUC LR 0.817 RF 0.831 XGB 0.812 ENS 0.835
+[   101 s]     semilla 11: backtesting ROC-AUC LR 0.817 RF 0.831 XGB 0.808 ENS 0.833
+[   108 s]     semilla 12: backtesting ROC-AUC LR 0.817 RF 0.834 XGB 0.820 ENS 0.838
+[   115 s]     semilla 13: backtesting ROC-AUC LR 0.817 RF 0.828 XGB 0.815 ENS 0.834
+[   123 s]     semilla 14: backtesting ROC-AUC LR 0.817 RF 0.831 XGB 0.811 ENS 0.834
+[   131 s]     semilla 15: backtesting ROC-AUC LR 0.817 RF 0.830 XGB 0.813 ENS 0.834
+[   139 s]     semilla 16: backtesting ROC-AUC LR 0.817 RF 0.831 XGB 0.817 ENS 0.837
+[   148 s]     semilla 17: backtesting ROC-AUC LR 0.817 RF 0.827 XGB 0.813 ENS 0.833
+[   155 s]     semilla 18: backtesting ROC-AUC LR 0.817 RF 0.831 XGB 0.826 ENS 0.839
+[   163 s]     semilla 19: backtesting ROC-AUC LR 0.817 RF 0.832 XGB 0.804 ENS 0.831
+[   171 s]     semilla 20: backtesting ROC-AUC LR 0.817 RF 0.834 XGB 0.814 ENS 0.835
+modelo                  LR      RF     XGB     ENS
+metrica                                           
+bt_Lift@10%            0.0  0.3156  0.3571  0.2677
+bt_PR_AUC              0.0  0.0027  0.0065  0.0036
+bt_ROC_AUC             0.0  0.0025  0.0058  0.0023
+bt_aciertos@20         0.0  0.3940  0.7182  0.2236
+cv_PR_AUC              0.0  0.0024  0.0082  0.0031
+cv_ROC_AUC             0.0  0.0006  0.0011  0.0004
+cv_de_pliegues         0.0  0.0008  0.0014  0.0005
+top50_modelo_conserva  0.0  0.0136  0.0275  0.0262
+top50_score_conserva   0.0  0.0167  0.0206  0.0218
+[   171 s] [2c] Top-50 en 200 reentrenamientos con celdas remuestreadas
+[   195 s]     20 reentrenamientos
+[   221 s]     40 reentrenamientos
+[   245 s]     60 reentrenamientos
+[   271 s]     80 reentrenamientos
+[   296 s]     100 reentrenamientos
+[   322 s]     120 reentrenamientos
+[   348 s]     140 reentrenamientos
+[   374 s]     160 reentrenamientos
+[   399 s]     180 reentrenamientos
+[   426 s]     200 reentrenamientos
+modelo  top50  conserva_media  conserva_p05  conserva_min  nucleo_90  ref_en_90  celdas_distintas  spearman_medio
+    LR modelo           0.656         0.540          0.44          7          7               227           0.944
+    LR  score           0.890         0.820          0.78         32         32                98           0.944
+    RF modelo           0.552         0.439          0.40          0          0               276           0.954
+    RF  score           0.804         0.759          0.70         22         22               122           0.954
+   XGB modelo           0.491         0.380          0.32          0          0               369           0.936
+   XGB  score           0.762         0.700          0.66         22         22               143           0.936
+   ENS modelo           0.590         0.460          0.42          2          2               252           0.960
+   ENS  score           0.818         0.760          0.70         27         27               113           0.960
+[   426 s] El ensamble ES el mas estable (gana o empata en 2 de 3 medidas).
+[   426 s] Listo: resultados/eleccion_*.csv y resultados/RESUMEN_ELECCION_MODELO.md
+== 12/15 Simulador con h = 120 (Tablas 6 y 13, Anexo J)
 === Celda representativa (Jacobo Hunter, puesto 4 del Top-10, score 0.972, h3 89b3354888bffff) ===
                1265
 P         8000.2011
@@ -338,7 +467,7 @@ Celdas viables donde el conteo OSM supera la estimacion: 2
 120       66.67        3.23   46451.65   10219.36       15.66                    16.73
 150       53.33        4.00   57600.06   12672.01       12.63                    13.70
 200       40.00        5.26   75789.57   16673.71        9.60                    10.67
-== 12/14 Datos de la aplicacion web
+== 13/15 Datos de la aplicacion web
 [1] hexes.json
     3,717 celdas · 25 columnas · 541 KB
 [2] mass.json
@@ -354,9 +483,9 @@ Celdas viables donde el conteo OSM supera la estimacion: 2
     aperturas por año: {'2024': 86, '2025': 32, '2026': 9}
 
 === LISTO === 574 KB en app_web/public/data
-== 13/14 Figura 19 (datos servidos)
+== 14/15 Figura 19 (datos servidos)
   >> figura19_datos_servidos.png (574 KB servidos; ahorro 67.0 %)
-== 14/14 Figuras 1, 2 y 4 (diagramas)
+== 15/15 Figuras 1, 2 y 4 (diagramas)
   >> figura01_fuentes_datos.png
   >> figura02_arquitectura.png
   >> figura04_flujo_modelado.png

@@ -35,6 +35,7 @@ Los modelos de localización comercial de la literatura internacional requieren 
 | Validación cruzada espacial (5 particiones, 52 bloques H3 r6; 3 717 celdas) | **ROC-AUC 0,917** [IC 95 %: 0,869–0,969] (ensamble; 0,932 en Random Forest, el mejor modelo individual) · PR-AUC 0,261 (ensamble) |
 | Backtesting temporal (1 486 candidatos, 39 aperturas reales, predictores y población al corte de 2024) | **ROC-AUC 0,831** [0,775–0,874] · **Lift@10 % 4,38** [2,82–5,96] · PR-AUC 0,111 |
 | Mejora sobre el mejor criterio univariado | +41,7 % en lift · +12,9 % en PR-AUC · +2,3 % en ROC-AUC (IC 95 % de las diferencias incluye 0) |
+| Ensamble frente a cada modelo | Sin diferencias significativas frente a Random Forest ni XGBoost (DeLong y bootstrap pareado; p de Holm > 0,05 en todas las pruebas) · menor variación del ROC-AUC y del lift del backtesting entre 20 semillas y mayor parte del Top-50 conservada en 200 reentrenamientos (81,8 %, frente a 80,4 % de Random Forest); Random Forest varía menos entre pliegues |
 | Comparación con la población 2017 sin actualizar | Ranking: Spearman 0,978 · Top-10 compartido 80 % · Top-50 82 %. Backtesting sobre los mismos 1 259 candidatos: ROC-AUC 0,801 frente a 0,809 (`comparar_poblacion.py`) |
 | Usabilidad con usuarios (SUS, n = 15) | 77,83 |
 | Aceptación tecnológica (TAM, n = 15) | 4,13 / 5 |
@@ -73,6 +74,7 @@ La exclusión de esas variables está verificada automáticamente por `verificar
 ├── calcular_ahp.py          Agregación del panel de expertos (Tablas 14 y 15)
 ├── analisis_complementarios.py  Robustez: bootstrap, Moran, VIF, AOA, fuga temporal
 ├── ic_validacion_espacial.py    IC 95 % de la validación cruzada espacial
+├── analisis_eleccion_modelo.py  Ensamble frente a cada modelo y baseline (DeLong, bootstrap) y estabilidad (Anexo K)
 ├── verificar_huff.py        Simulador y sensibilidad a h con h = 120 (Tablas 6 y 13, Anexo J)
 ├── requirements.txt         Versiones exactas de las dependencias de Python
 │
@@ -125,8 +127,8 @@ bash ejecutar_todo.sh        # en macOS también: doble clic en ejecutar_mac.com
 La secuencia corre primero la comparación con la población 2017 sin actualizar
 (`resultados/base_censo2017/`) y luego el modelo principal con la población
 actualizada al Censo 2025 (`resultados/`), seguidos de las verificaciones, los
-análisis de robustez, las figuras y los datos de la aplicación. Tarda unos tres
-minutos en una computadora personal.
+análisis de robustez, las figuras y los datos de la aplicación. Tarda unos ocho
+minutos en una computadora personal; unos siete son de `analisis_eleccion_modelo.py`.
 
 **Población actualizada.** `poblacion_actualizada.py` reparte el crecimiento
 censal 2017-2025 de cada distrito (INEI) entre sus celdas según las edificaciones
@@ -135,6 +137,15 @@ edificaciones se exportó una sola vez desde Google Earth Engine
 (`data/edificaciones/exportar_open_buildings.js`) y su resumen por celda está en
 `data/edificaciones/edificaciones_h3.csv`, por lo que la reejecución no requiere
 cuenta de Earth Engine.
+
+**Elección del modelo.** `analisis_eleccion_modelo.py` compara el ensamble con
+cada modelo y cada baseline (prueba de DeLong para el ROC-AUC; bootstrap pareado
+para el PR-AUC y el lift, por bloques H3 r6 en la validación espacial; p de Holm)
+y mide la estabilidad de los cuatro modelos entre pliegues, con 20 semillas y en
+el Top-50 de 200 reentrenamientos con celdas remuestreadas. La regla para declarar
+al más estable está fijada en su encabezado. Escribe `resultados/eleccion_*.csv` y
+`resultados/RESUMEN_ELECCION_MODELO.md`, y comprueba que con la semilla 42
+reproduce exactamente las predicciones de `pipeline.py`.
 
 **Panel de expertos (AHP).** `calcular_ahp.py` lee las comparaciones pareadas de
 `data/panel/matrices_ahp.csv` (columnas `experto,criterio_a,criterio_b,valor`) y
@@ -208,7 +219,7 @@ Requiere PHP 8.2+, Composer, Node.js 20+ y pnpm 9. Detalles en `app_web/README.m
 
 3. **Características.** 49 variables construidas en cinco familias —demanda poblacional, estructura territorial, morfología vial, puntos de interés y competencia—, de las cuales 37 constituyen predictores efectivos tras excluir las derivadas de la red de retail moderno.
 
-4. **Modelado.** Comparación de regresión logística, Random Forest, XGBoost y un ensamble por promedio de rangos percentiles, con ponderación de clases inversa a su frecuencia.
+4. **Modelado.** Comparación de regresión logística, Random Forest, XGBoost y un ensamble por promedio de rangos percentiles, con ponderación de clases inversa a su frecuencia. Ninguna diferencia de rendimiento entre el ensamble y Random Forest o XGBoost es significativa; el sistema usa el ensamble por su estabilidad frente a la semilla y a la muestra de entrenamiento (`analisis_eleccion_modelo.py`).
 
 5. **Validación.** Validación cruzada agrupada sobre 52 bloques H3 de resolución 6 —para evitar la sobreestimación que produce la partición aleatoria en datos espacialmente autocorrelacionados— y backtesting temporal contra aperturas no observadas durante el entrenamiento.
 
@@ -216,7 +227,7 @@ Requiere PHP 8.2+, Composer, Node.js 20+ y pnpm 9. Detalles en `app_web/README.m
 
 ## Reproducibilidad
 
-- Semilla aleatoria fija en `42` para todos los procesos estocásticos
+- Semilla aleatoria fija en `42` para todos los procesos estocásticos; `analisis_eleccion_modelo.py` repite además el entrenamiento con las semillas 1 a 20
 - Sistemas de referencia: EPSG:4326 (geográfico) y EPSG:32719 (proyectado, UTM 19S)
 - Versiones exactas de las librerías en `requirements.txt`
 
