@@ -24,6 +24,19 @@ php artisan serve
 La aplicación queda en http://localhost:8000. Para desarrollo con recarga en caliente,
 ejecutar `pnpm dev` en otra terminal en lugar de `pnpm build`.
 
+El modo comerciante está en http://localhost:8000/comerciante.
+
+## Sitio estático (sin PHP)
+
+```bash
+pnpm install
+pnpm build:sitio
+```
+
+Deja la aplicación en `dist-sitio/`, lista para cualquier alojamiento estático: usa
+rutas con `#` (`index.html#/comerciante`) y direcciones relativas. En GitHub la
+publica `.github/workflows/sitio.yml` en cada `git push` que cambie `app_web/`.
+
 ## Actualizar los datos
 
 Los JSON de `public/data/` se generan desde la raíz del proyecto, después de ejecutar
@@ -37,7 +50,9 @@ python scripts/10_generar_json_app.py
 
 ```
 resources/js/
-├── pages/            Resumen, mapa, ranking, simulador, validación y fuentes
+├── pages/            Resumen, mapa, ranking, simulador, validación y fuentes;
+│                     comerciante.vue y ficha.vue (modo comerciante)
+├── utils/comerciante.js  Textos en lenguaje simple del modo comerciante
 ├── stores/sigret.js  Carga de datos, score y modelo de Huff (estado central)
 └── views/sigret/     Mapa de hexágonos, controles del modelo y componentes propios
 public/data/          Datos servidos (generados por el pipeline)

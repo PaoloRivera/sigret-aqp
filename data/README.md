@@ -23,6 +23,8 @@ Procedencia, licencia y volumen de cada fuente empleada por el pipeline.
 | `campo/muestra_campo.csv`, `.geojson`, `.kml` | Muestra del conteo de campo: 36 celdas y 12 reservas en seis estratos | Generado por `scripts/14_muestra_campo.py` (semilla 42) | — |
 | `campo/plan_jornadas.csv`, `campo/precision_esperada.csv` | Orden sugerido de visita y precisión esperada de h con esta muestra | `scripts/14_muestra_campo.py` | — |
 | `campo/formulario_kobo.xlsx` | Formulario XLSForm del conteo para KoboToolbox | `scripts/14_muestra_campo.py` | — |
+| `encuestas/formulario_ronda2.xlsx` | Formulario XLSForm de la segunda ronda de evaluación (SUS y TAM por pregunta, anónimo) | `scripts/16_formulario_ronda2.py` | — |
+| `encuestas/ronda2_respuestas.csv` | Respuestas de la segunda ronda, sin texto libre ni horas (cuando exista) | `evaluacion_ronda2.py --kobo` | — |
 
 > **Atribución obligatoria.** Los archivos de la carpeta `osm/` derivan de OpenStreetMap y deben acreditarse como *© colaboradores de OpenStreetMap*, conforme exige la Open Database License.
 
@@ -39,6 +41,14 @@ Para regenerarlo:
 3. Ejecutar `python scripts/04_filtrar_sunat.py`.
 
 Este archivo se emplea únicamente como indicador de densidad de actividad económica formal por zona y **no es indispensable** para reproducir las métricas principales del modelo.
+
+### Exportación de la segunda ronda de evaluación
+
+La exportación de KoboToolbox va en `data/encuestas/kobo/ronda2.xlsx`, que no se
+publica porque trae las respuestas abiertas y la hora de cada envío.
+`evaluacion_ronda2.py --kobo` escribe `encuestas/ronda2_respuestas.csv`, que sí
+se publica y basta para reproducir el análisis. El procedimiento está en
+`docs/evaluacion/protocolo_ronda2.md`.
 
 ### Exportación del conteo de campo
 

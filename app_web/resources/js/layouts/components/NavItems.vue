@@ -4,6 +4,16 @@ import VerticalNavSectionTitle from '@layouts/components/VerticalNavSectionTitle
 </script>
 
 <template>
+  <VerticalNavSectionTitle :item="{ heading: 'Para comerciantes' }" />
+
+  <VerticalNavLink
+    :item="{
+      title: 'Modo comerciante',
+      icon: 'bx-store',
+      to: '/comerciante',
+    }"
+  />
+
   <VerticalNavSectionTitle :item="{ heading: 'Análisis' }" />
 
   <VerticalNavLink

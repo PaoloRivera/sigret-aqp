@@ -41,6 +41,16 @@ const fechaDatos = computed(() => {
 
         <VSpacer />
 
+        <VBtn
+          to="/comerciante"
+          size="small" variant="tonal" color="primary"
+          prepend-icon="bx-store"
+          class="me-2"
+        >
+          <span class="d-none d-sm-inline">Modo comerciante</span>
+          <span class="d-sm-none">Comerciante</span>
+        </VBtn>
+
         <VChip
           v-if="fechaDatos"
           size="small" variant="tonal" color="secondary" label

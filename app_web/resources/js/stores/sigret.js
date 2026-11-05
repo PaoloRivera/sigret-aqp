@@ -9,7 +9,9 @@ import { defineStore } from 'pinia'
 // sin necesidad de ir al servidor.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BASE = '/data'
+// Carpeta de los JSON. La compilación estática (vite.static.config.js) la
+// cambia por una ruta relativa para poder publicarse en cualquier dirección.
+const BASE = import.meta.env.VITE_DATOS ?? '/data'
 
 // ── Modelo de interacción espacial de Huff ───────────────────────────────────
 // La cuota es la atractividad propia sobre la atractividad total del área de
@@ -45,6 +47,32 @@ export function huff(h, p, superficie = p.superficie) {
   return { bodegas, cuota, ventas, bruto, payback, aNueva, aRival }
 }
 
+// Parámetros elicitados del panel de propietarios (AHP) y supuestos del
+// simulador. El modo comerciante usa siempre estos valores para el ranking.
+export const PARAMS_PANEL = Object.freeze({
+  wPerfil: 0.344,      // peso del perfil aprendido vs demanda residual (AHP)
+  penalizacion: 0.261, // castigo por proximidad de hard discount (AHP)
+  radioAmenaza: 750,   // alcance en metros de ese castigo (mediana del panel)
+  pobMinima: 1500,     // umbral de viabilidad
+  habPorBodega: 120,   // densidad de oferta informal estimada
+  hCampo: null,        // h del conteo de campo, si existe (meta.campo.h)
+  gastoPerCapita: 180, // S/ mensuales en canal bodega
+  inversion: 160000,   // S/ de inversión inicial
+  margen: 0.22,        // margen bruto del canal
+  superficie: 100,     // m² de sala de venta
+})
+
+// Score de decisión de una celda con los parámetros p
+export function puntuar(h, p) {
+  const riesgo = Math.min(Math.max(1 - h.d_mass_2026 / p.radioAmenaza, 0), 1)
+  const viable = h.pob_k1 >= p.pobMinima && h.mass_2026 === 0
+  const score = viable
+    ? (p.wPerfil * h.p_potencial + (1 - p.wPerfil) * h.dem_res_n) * (1 - p.penalizacion * riesgo)
+    : 0
+
+  return { riesgo, viable, score }
+}
+
 export const useSigret = defineStore('sigret', {
   state: () => ({
     ready: false,
@@ -59,19 +87,8 @@ export const useSigret = defineStore('sigret', {
     competencia: [],
     meta: null,
 
-    // Parámetros del modelo de decisión
-    p: {
-      wPerfil: 0.344,      // peso del perfil aprendido vs demanda residual (AHP)
-      penalizacion: 0.261, // castigo por proximidad de hard discount (AHP)
-      radioAmenaza: 750,   // alcance en metros de ese castigo (mediana del panel)
-      pobMinima: 1500,     // umbral de viabilidad
-      habPorBodega: 120,   // densidad de oferta informal estimada
-      hCampo: null,        // h del conteo de campo, si existe (meta.campo.h)
-      gastoPerCapita: 180, // S/ mensuales en canal bodega
-      inversion: 160000,   // S/ de inversión inicial
-      margen: 0.22,        // margen bruto del canal
-      superficie: 100,     // m² de sala de venta
-    },
+    // Parámetros del modelo de decisión (los controla la versión técnica)
+    p: { ...PARAMS_PANEL },
 
     filtros: {
       distritos: [],
@@ -87,20 +104,8 @@ export const useSigret = defineStore('sigret', {
       if (!state.ready)
         return []
 
-      const { wPerfil, penalizacion, radioAmenaza, pobMinima } = state.p
-
-      const wDemanda = 1 - wPerfil
-
       return state.hex.map(h => {
-        const riesgo = Math.min(Math.max(1 - h.d_mass_2026 / radioAmenaza, 0), 1)
-        const viable = h.pob_k1 >= pobMinima && h.mass_2026 === 0
-
-        let score = 0
-        if (viable) {
-          score = (wPerfil * h.p_potencial + wDemanda * h.dem_res_n)
-            * (1 - penalizacion * riesgo)
-        }
-
+        const { riesgo, viable, score } = puntuar(h, state.p)
         const e = huff(h, state.p)
 
         return {
@@ -130,6 +135,22 @@ export const useSigret = defineStore('sigret', {
 
     ranking() {
       return [...this.hexesVisibles].sort((a, b) => b.score - a.score)
+    },
+
+    // Ranking de todas las celdas viables con los pesos del panel, sin los
+    // filtros ni los controles de la versión técnica (modo comerciante).
+    // Cada celda trae su puesto y la parte de celdas viables que la supera.
+    rankingPanel(state) {
+      if (!state.ready)
+        return []
+
+      const p = { ...PARAMS_PANEL, habPorBodega: state.p.hCampo ?? PARAMS_PANEL.habPorBodega, hCampo: state.p.hCampo }
+      const viables = state.hex
+        .map(h => ({ ...h, ...puntuar(h, p), bodegas: huff(h, p).bodegas }))
+        .filter(h => h.viable)
+        .sort((a, b) => b.score - a.score)
+
+      return viables.map((h, i) => ({ ...h, puesto: i + 1, superado: i / viables.length }))
     },
 
     kpis(state) {
@@ -231,18 +252,7 @@ export const useSigret = defineStore('sigret', {
 
     reset() {
       const hCampo = this.p.hCampo
-      this.p = {
-        wPerfil: 0.344,
-        penalizacion: 0.261,
-        radioAmenaza: 750,
-        pobMinima: 1500,
-        habPorBodega: hCampo ?? 120,
-        hCampo,
-        gastoPerCapita: 180,
-        inversion: 160000,
-        margen: 0.22,
-        superficie: 100,
-      }
+      this.p = { ...PARAMS_PANEL, habPorBodega: hCampo ?? PARAMS_PANEL.habPorBodega, hCampo }
     },
 
     seleccionar(h3) {

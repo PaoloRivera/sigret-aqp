@@ -27,6 +27,8 @@ const props = defineProps({
   mostrarCompetencia: { type: Boolean, default: false },
   centrarEn: { type: Object, default: null },
   interactivo: { type: Boolean, default: true },
+  // Celda H3 que se resalta con un borde (modo comerciante)
+  destacar: { type: String, default: null },
 })
 
 const store = useSigret()
@@ -175,7 +177,34 @@ function pintarCapas() {
     })
   }
 
+  pintarDestacado()
   actualizarVisibilidad()
+}
+
+function destacadoGeoJSON() {
+  return {
+    type: 'FeatureCollection',
+    features: props.destacar
+      ? [{ type: 'Feature', geometry: { type: 'Polygon', coordinates: [cellToBoundary(props.destacar, true)] }, properties: {} }]
+      : [],
+  }
+}
+
+function pintarDestacado() {
+  if (!map || !estiloListo)
+    return
+  if (map.getSource('destacado')) {
+    map.getSource('destacado').setData(destacadoGeoJSON())
+
+    return
+  }
+  map.addSource('destacado', { type: 'geojson', data: destacadoGeoJSON() })
+  map.addLayer({
+    id: 'destacado-borde',
+    type: 'line',
+    source: 'destacado',
+    paint: { 'line-color': '#FFFFFF', 'line-width': 3.5, 'line-opacity': 1 },
+  })
 }
 
 function actualizarVisibilidad() {
@@ -286,6 +315,7 @@ watch(() => [props.extrusion, props.mostrarMass, props.mostrarCompetencia], () =
   if (map)
     map.easeTo({ pitch: props.extrusion ? 47 : 0, duration: 500 })
 })
+watch(() => props.destacar, () => pintarDestacado())
 watch(() => props.centrarEn, v => {
   if (v && map)
     map.flyTo({ center: [v.lon, v.lat], zoom: 14.6, duration: 900 })

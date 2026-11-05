@@ -10,8 +10,11 @@ y el Google Chrome instalado, a 1710 px de ancho y densidad 2x (3420 px).
 Requisitos: compilar antes la aplicacion (cd app_web && npm run build), tener
 Google Chrome instalado y el paquete playwright (pip install playwright).
 Uso, desde la raiz del proyecto:
-    python scripts/11_capturas_app.py
-Salida: docs/capturas/figura05_resumen.png ... figura11_fuentes.png
+    python scripts/11_capturas_app.py            # Figuras 5 a 11
+    python scripts/11_capturas_app.py --anexo-l  # solo el modo comerciante (Anexo L)
+Salida: docs/capturas/figura05_resumen.png ... figura11_fuentes.png y, con
+--anexo-l, docs/capturas/anexo_l_pasos.png, anexo_l_calculo.png,
+anexo_l_celular.png y anexo_l_ficha.png
 """
 import http.server
 import json
@@ -79,6 +82,27 @@ def caja(pg, texto):
     return pg.get_by_text(texto, exact=True).first.locator(xp).bounding_box()
 
 
+def anexo_l(p, nav):
+    """Modo comerciante (Anexo L): pasos 1 y 2, paso 3, celular y ficha."""
+    pg = nav.new_page(viewport={"width": 1280, "height": 900}, device_scale_factor=2, color_scheme="light")
+    abrir(pg, "/comerciante", "text=Mira las mejores zonas", 8000)
+    pg.screenshot(path=os.path.join(SALIDA, "anexo_l_pasos.png"))
+    print("  >> anexo_l_pasos.png")
+    pg.get_by_text("Calcular mis números").first.click()
+    pg.wait_for_timeout(6000)
+    pg.screenshot(path=os.path.join(SALIDA, "anexo_l_calculo.png"))
+    print("  >> anexo_l_calculo.png")
+    pg.get_by_text("Ver e imprimir la ficha").click()
+    pg.wait_for_selector("text=Tus números", timeout=60000)
+    pg.wait_for_timeout(1500)
+    pg.screenshot(path=os.path.join(SALIDA, "anexo_l_ficha.png"), full_page=True)
+    print("  >> anexo_l_ficha.png")
+    cel = nav.new_context(**p.devices["iPhone 13"], color_scheme="light").new_page()
+    abrir(cel, "/comerciante", "text=Mira las mejores zonas", 6000)
+    cel.screenshot(path=os.path.join(SALIDA, "anexo_l_celular.png"))
+    print("  >> anexo_l_celular.png")
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     socketserver.TCPServer.allow_reuse_address = True
@@ -90,6 +114,10 @@ def main():
                 nav = p.chromium.launch(channel="chrome")
             except Exception:
                 nav = p.chromium.launch()
+            if "--anexo-l" in sys.argv:
+                anexo_l(p, nav)
+                nav.close()
+                return
             pg = nav.new_page(viewport=VENTANA, device_scale_factor=2, color_scheme="light")
             abrir(pg, "/panel", "text=Hallazgo principal", 6000)          # carga inicial de los datos
             for nombre, ruta, senal, espera, alto, desplazar in (

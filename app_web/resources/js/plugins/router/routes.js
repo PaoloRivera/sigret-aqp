@@ -47,6 +47,18 @@ export const routes = [
     component: () => import('@/layouts/blank.vue'),
     children: [
       {
+        path: 'comerciante',
+        name: 'comerciante',
+        component: () => import('@/pages/comerciante.vue'),
+        meta: { titulo: 'Para comerciantes' },
+      },
+      {
+        path: 'comerciante/ficha/:h3',
+        name: 'ficha',
+        component: () => import('@/pages/ficha.vue'),
+        meta: { titulo: 'Ficha de ubicación' },
+      },
+      {
         path: '/:pathMatch(.*)*',
         component: () => import('@/pages/[...error].vue'),
       },

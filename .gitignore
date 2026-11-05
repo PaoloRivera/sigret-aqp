@@ -57,3 +57,7 @@ respaldo_tesis_v7/
 # Exportacion y fotos del conteo de campo: ubican bodegas que funcionan en
 # viviendas. Se publican solo los conteos por celda (resultados/campo/).
 data/campo/kobo/
+
+# Exportacion de la segunda ronda de evaluacion: trae respuestas abiertas y la
+# hora de cada envio. Se publica data/encuestas/ronda2_respuestas.csv.
+data/encuestas/kobo/

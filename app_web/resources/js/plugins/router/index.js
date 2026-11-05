@@ -1,8 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import { routes } from './routes'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  // La compilación estática usa rutas con # para funcionar sin servidor propio
+  history: import.meta.env.VITE_RUTAS === 'hash'
+    ? createWebHashHistory()
+    : createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 

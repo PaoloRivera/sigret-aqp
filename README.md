@@ -76,6 +76,7 @@ La exclusión de esas variables está verificada automáticamente por `verificar
 ├── ic_validacion_espacial.py    IC 95 % de la validación cruzada espacial
 ├── analisis_eleccion_modelo.py  Ensamble frente a cada modelo y baseline (DeLong, bootstrap) y estabilidad (Anexo K)
 ├── verificar_huff.py        Simulador y sensibilidad a h con h = 120 (Tablas 6 y 13, Anexo J)
+├── evaluacion_ronda2.py     Segunda ronda SUS y TAM con propietarios de minimarket (opcional)
 ├── requirements.txt         Versiones exactas de las dependencias de Python
 │
 ├── scripts/                 Adquisición de datos (ejecución única) y exportación a la web
@@ -89,17 +90,20 @@ La exclusión de esas variables está verificada automáticamente por `verificar
 │   ├── 08_osm_lugares.py            Urbanizaciones y límites distritales
 │   ├── 09_poblacion.py              Población modelada de verificación
 │   ├── 10_generar_json_app.py       Resultados del pipeline → JSON de la aplicación web
-│   ├── 11_capturas_app.py           Capturas de la aplicación (Figuras 5 a 11)
+│   ├── 11_capturas_app.py           Capturas de la aplicación (Figuras 5 a 11; --anexo-l: modo comerciante)
 │   ├── 12_figura_datos_servidos.py  Figura 19
 │   ├── 13_diagramas.py              Figuras 1, 2 y 4
 │   ├── 14_muestra_campo.py          Muestra, mapas y formulario del conteo de campo (opcional)
-│   └── 15_calibrar_bodegas.py       Conteo de campo → h medido y simulador (opcional)
+│   ├── 15_calibrar_bodegas.py       Conteo de campo → h medido y simulador (opcional)
+│   └── 16_formulario_ronda2.py      Formulario anónimo de la segunda ronda de evaluación
 │
 ├── data/                    Datos de entrada (ver data/README.md)
 ├── resultados/              Salidas del pipeline (tablas y matrices)
 ├── figuras/                 Figuras de los Capítulos IV y V y mapa del Anexo I
 ├── docs/capturas/           Capturas de la aplicación (Figuras 5 a 11)
 ├── docs/campo/              Mapas y protocolo del conteo de campo (opcional)
+├── docs/evaluacion/         Protocolo de la segunda ronda de evaluación
+├── .github/workflows/       Publicación de la aplicación en GitHub Pages
 └── app_web/                 Aplicación web (Vue 3 + Vuetify + Laravel, ver app_web/README.md)
 ```
 
@@ -173,6 +177,26 @@ y con él se reproduce todo: `--conteos resultados/campo/conteo_por_celda.csv`.
 la aplicación web usa entonces el h de campo. El conteo no cambia el ranking:
 la ecuación 1 solo entra en el simulador.
 
+**Modo comerciante y segunda ronda de evaluación (opcional).** La aplicación
+tiene un modo comerciante (`/comerciante`): tres pasos en lenguaje simple, sin
+métricas del modelo, enlace a Google Maps por zona y una ficha imprimible. Usa
+el mismo ranking, con los pesos del panel. Para evaluarlo con propietarios de
+minimarket, `.github/workflows/sitio.yml` publica la aplicación en
+<https://paolorivera.github.io/sigret-aqp/#/comerciante> (activar una vez
+*Settings > Pages > Source: GitHub Actions*), `scripts/16_formulario_ronda2.py`
+genera el formulario anónimo de KoboToolbox y `docs/evaluacion/protocolo_ronda2.md`
+explica la recolección. Con la exportación en `data/encuestas/kobo/ronda2.xlsx`:
+
+```bash
+python evaluacion_ronda2.py --kobo data/encuestas/kobo/ronda2.xlsx
+```
+
+estima el SUS y cada dimensión del TAM con su IC 95 %, las prueba con Wilcoxon
+frente a 68 y 75 y frente a 4,0, calcula el alfa de Cronbach y escribe los
+párrafos para la tesis en `resultados/ronda2/RESUMEN_RONDA2.md`. La carpeta
+`data/encuestas/kobo/` no se publica; `data/encuestas/ronda2_respuestas.csv` sí,
+y con él se reproduce todo (`--respuestas`).
+
 ## Regenerar los datos desde las fuentes originales
 
 Solo es necesario para actualizar los datos. Las rutinas escriben en `out/` y `raw/`,
@@ -208,6 +232,8 @@ php artisan serve
 ```
 
 Requiere PHP 8.2+, Composer, Node.js 20+ y pnpm 9. Detalles en `app_web/README.md`.
+Para publicarla sin PHP, como sitio estático: `pnpm build:sitio` deja la
+aplicación en `app_web/dist-sitio/`, con rutas `#/` y direcciones relativas.
 
 ---
 

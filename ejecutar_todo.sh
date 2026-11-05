@@ -31,6 +31,14 @@ elif [ -f resultados/campo/conteo_por_celda.csv ]; then
   echo "== 12b Conteo de campo, desde los conteos publicados"
   "$PY" scripts/15_calibrar_bodegas.py --conteos resultados/campo/conteo_por_celda.csv
 fi
+# Segunda ronda de evaluacion (observacion 5), solo si ya hay respuestas
+if [ -f data/encuestas/kobo/ronda2.xlsx ]; then
+  echo "== 12c Segunda ronda de evaluacion"
+  "$PY" evaluacion_ronda2.py --kobo data/encuestas/kobo/ronda2.xlsx
+elif [ -f data/encuestas/ronda2_respuestas.csv ]; then
+  echo "== 12c Segunda ronda de evaluacion, desde las respuestas publicadas"
+  "$PY" evaluacion_ronda2.py --respuestas data/encuestas/ronda2_respuestas.csv
+fi
 echo "== 13/15 Datos de la aplicacion web";          "$PY" scripts/10_generar_json_app.py
 echo "== 14/15 Figura 19 (datos servidos)";          "$PY" scripts/12_figura_datos_servidos.py
 echo "== 15/15 Figuras 1, 2 y 4 (diagramas)";        "$PY" scripts/13_diagramas.py
