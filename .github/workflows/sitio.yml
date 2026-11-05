@@ -1,0 +1,52 @@
+# Publica la aplicación como sitio estático en GitHub Pages, para que los
+# participantes de la evaluación la abran con un enlace desde su celular:
+#   https://paolorivera.github.io/sigret-aqp/#/comerciante
+# Requiere activar una vez: Settings > Pages > Source: GitHub Actions.
+name: Sitio de la aplicación
+
+on:
+  push:
+    branches: [main]
+    paths: ['app_web/**', '.github/workflows/sitio.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app_web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: app_web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:sitio
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app_web/dist-sitio
+
+  publicar:
+    needs: compilar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v4
