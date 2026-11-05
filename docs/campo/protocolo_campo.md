@@ -1,4 +1,4 @@
-# Protocolo del conteo de campo de bodegas (Anexo K)
+# Protocolo del conteo de campo de bodegas
 
 Objetivo: contar todas las bodegas, minimarkets y tiendas de abarrotes abiertas
 en 36 celdas H3 sorteadas, para medir cuántos habitantes hay por bodega (h) y

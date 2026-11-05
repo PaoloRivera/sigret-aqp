@@ -90,14 +90,14 @@ La exclusión de esas variables está verificada automáticamente por `verificar
 │   ├── 11_capturas_app.py           Capturas de la aplicación (Figuras 5 a 11)
 │   ├── 12_figura_datos_servidos.py  Figura 19
 │   ├── 13_diagramas.py              Figuras 1, 2 y 4
-│   ├── 14_muestra_campo.py          Muestra, mapas y formulario del conteo de campo (Anexo K)
-│   └── 15_calibrar_bodegas.py       Conteo de campo → h calibrado y simulador (Anexo K)
+│   ├── 14_muestra_campo.py          Muestra, mapas y formulario del conteo de campo (opcional)
+│   └── 15_calibrar_bodegas.py       Conteo de campo → h medido y simulador (opcional)
 │
 ├── data/                    Datos de entrada (ver data/README.md)
 ├── resultados/              Salidas del pipeline (tablas y matrices)
 ├── figuras/                 Figuras de los Capítulos IV y V y mapa del Anexo I
 ├── docs/capturas/           Capturas de la aplicación (Figuras 5 a 11)
-├── docs/campo/              Mapas y protocolo del conteo de campo (Anexo K)
+├── docs/campo/              Mapas y protocolo del conteo de campo (opcional)
 └── app_web/                 Aplicación web (Vue 3 + Vuetify + Laravel, ver app_web/README.md)
 ```
 
@@ -140,8 +140,10 @@ cuenta de Earth Engine.
 `data/panel/matrices_ahp.csv` (columnas `experto,criterio_a,criterio_b,valor`) y
 escribe las Tablas 14 y 15 en `resultados/`.
 
-**Conteo de campo (Anexo K).** La ecuación 1 del simulador estima las bodegas
-como población / h. `scripts/14_muestra_campo.py` sortea 36 celdas en seis
+**Conteo de campo (opcional, trabajo futuro).** La ecuación 1 del simulador
+estima las bodegas como población / h, con h = 120 tomado de fuentes
+secundarias (sección 3.4.4 de la tesis). Para medirlo en Arequipa,
+`scripts/14_muestra_campo.py` sortea 36 celdas en seis
 estratos (densidad × zona consolidada o de expansión) y prepara los mapas, el
 plan de jornadas y el formulario de KoboToolbox (`data/campo/`, `docs/campo/`);
 `docs/campo/protocolo_campo.md` explica el trabajo de campo. Con la exportación
@@ -222,7 +224,7 @@ Requiere PHP 8.2+, Composer, Node.js 20+ y pnpm 9. Detalles en `app_web/README.m
 
 ## Limitaciones declaradas
 
-1. La competencia informal no es identificable de forma exhaustiva; se estima por densidad poblacional, con el número de habitantes por bodega calibrado mediante el conteo de campo del Anexo K, y se declara como parámetro ajustable desde la interfaz. Solo afecta al simulador, no al ranking.
+1. La competencia informal no es identificable de forma exhaustiva; se estima por densidad poblacional, con 120 habitantes por bodega tomados de fuentes secundarias, y se declara como parámetro ajustable desde la interfaz. Solo afecta al simulador, no al ranking. El repositorio incluye las herramientas para medirlo en campo (`scripts/14_muestra_campo.py` y `scripts/15_calibrar_bodegas.py`).
 2. Los cálculos de proximidad emplean distancia euclidiana; la red vial se usa para caracterizar morfología pero no para enrutamiento peatonal.
 3. La población 2025 de cada distrito es oficial (Censo 2025), pero su reparto entre celdas es una estimación por edificaciones nuevas: el Censo 2025 aún no publica datos por manzana, y el crecimiento por densificación vertical queda subrepresentado.
 4. La variable objetivo indica que un emplazamiento *opera*, no que *sea rentable*.

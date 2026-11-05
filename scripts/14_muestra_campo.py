@@ -26,7 +26,7 @@ Salidas:
   data/campo/precision_esperada.csv  amplitud esperada del IC de h con esta muestra
   data/campo/formulario_kobo.xlsx    formulario XLSForm para KoboToolbox
   docs/campo/mapas_campo.pdf         mapa general, plan de jornadas y una pagina por celda
-  figuras/anexo_k_muestra_campo.png  mapa general de la muestra
+  figuras/campo_muestra.png  mapa general de la muestra
 
 Si data/campo/muestra_campo.csv ya existe, el script comprueba que el sorteo
 da las mismas celdas y no lo sobrescribe si cambiaron (por ejemplo, tras
@@ -265,7 +265,7 @@ def mapa_general(ax):
 fig, ax = plt.subplots(figsize=(8.5, 8.5))
 mapa_general(ax)
 ax.set_title("Muestra del conteo de campo: 36 celdas y 12 reservas", loc="left", fontsize=11, weight="bold")
-fig.savefig(f"{OUT_FIG}/anexo_k_muestra_campo.png", dpi=200, bbox_inches="tight", facecolor="white")
+fig.savefig(f"{OUT_FIG}/campo_muestra.png", dpi=200, bbox_inches="tight", facecolor="white")
 plt.close(fig)
 
 PRINC = {"primary", "secondary", "tertiary", "trunk", "primary_link", "secondary_link"}
@@ -425,4 +425,4 @@ print(f"Plan: {len(jornadas)} jornadas, {TOTAL_H:.1f} h con traslados "
 print("Precision esperada de h si fuera 120:")
 print(pd.DataFrame(prec).to_string(index=False))
 print(f"  >> {OUT_DATA}/muestra_campo.csv, .geojson, .kml, plan_jornadas.csv, precision_esperada.csv; "
-      f"{OUT_DOCS}/mapas_campo.pdf; {OUT_FIG}/anexo_k_muestra_campo.png")
+      f"{OUT_DOCS}/mapas_campo.pdf; {OUT_FIG}/campo_muestra.png")

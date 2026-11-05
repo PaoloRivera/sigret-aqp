@@ -98,7 +98,7 @@ faltan = [c for c in COLS if c not in ("h3", "dist") and ORIGEN.get(c, c) not in
 if faltan:
     salir(f"Columnas ausentes en resultado_final.parquet: {faltan}")
 
-# Conteo de campo (Anexo K): si existe, cada celda lleva las bodegas estimadas
+# Conteo de campo opcional (scripts 14 y 15): si existe, cada celda lleva las bodegas estimadas
 # en su area de captacion con la ecuacion 1 calibrada, y el simulador las usa
 CAMPO = f"{RES}/campo/bodegas_k1_calibradas.parquet"
 H_CAMPO = f"{RES}/campo/h_calibrado.json"

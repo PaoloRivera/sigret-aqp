@@ -2,7 +2,7 @@
 """
 15_calibrar_bodegas.py
 
-Procesa el conteo de campo de bodegas (Anexo K) y recalibra la ecuacion 1 del
+Procesa el conteo de campo de bodegas (opcional) y recalibra la ecuacion 1 del
 simulador economico. No cambia el modelo predictivo ni el score: la ecuacion 1
 solo interviene en el simulador.
 
@@ -41,7 +41,7 @@ Salidas (resultados/campo/; ninguna lleva puntos ni fotos)
   bodegas_k1_calibradas.parquet   bodegas estimadas por area de captacion (aplicacion web)
   h_calibrado.json                forma elegida de la ecuacion 1 y sus parametros
   RESUMEN_CAMPO.md                valores para los marcadores [..] de la tesis
-  figuras/anexo_k_bodegas_poblacion.png
+  figuras/campo_bodegas_poblacion.png
   data/campo/kobo/posibles_duplicados.csv (solo con --kobo; queda fuera del repositorio)
 
 Uso, desde la raiz del proyecto:
@@ -101,7 +101,7 @@ def num(x, d=0):
     return s
 
 
-ap = argparse.ArgumentParser(description="Conteo de campo de bodegas (Anexo K)")
+ap = argparse.ArgumentParser(description="Conteo de campo de bodegas")
 fuente = ap.add_mutually_exclusive_group(required=True)
 fuente.add_argument("--kobo", help="exportacion de KoboToolbox (.xlsx o .csv)")
 fuente.add_argument("--conteos", help="conteo_por_celda.csv ya procesado")
@@ -673,7 +673,7 @@ ax.spines[["top", "right"]].set_visible(False)
 ax.legend(frameon=False, fontsize=8)
 ax.set_title("Conteo de campo: establecimientos frente a población por celda", loc="left", fontsize=11,
              weight="bold")
-fig.savefig(f"{FIG}/anexo_k_bodegas_poblacion.png", dpi=200, bbox_inches="tight", facecolor="white")
+fig.savefig(f"{FIG}/campo_bodegas_poblacion.png", dpi=200, bbox_inches="tight", facecolor="white")
 plt.close(fig)
 
 # ── 9. Parametros para la aplicacion y resumen para la tesis ────────────────
@@ -748,4 +748,4 @@ with open(f"{OUT}/RESUMEN_CAMPO.md", "w", encoding="utf-8") as f:
 print(f"[9] Variante {TEXTO_VAR}; h equivalente = {h_equiv:.1f}")
 print(f"  >> {OUT}/ (conteo_por_celda, estimacion_h, modelos_conteo, cobertura_osm, simulador_recalibrado, "
       f"anexo_j_campo, score_vs_campo, bodegas_k1_calibradas, h_calibrado.json, RESUMEN_CAMPO.md); "
-      f"{FIG}/anexo_k_bodegas_poblacion.png")
+      f"{FIG}/campo_bodegas_poblacion.png")

@@ -16,7 +16,7 @@ const BASE = '/data'
 // captación. OpenStreetMap registra muy pocas bodegas, así que la oferta
 // informal se estima por densidad poblacional y se toma el máximo frente al
 // conteo observado, para no contar dos veces el mismo competidor.
-// Si existe el conteo de campo (scripts/15_calibrar_bodegas.py, Anexo K), cada
+// Si existe el conteo de campo (scripts/15_calibrar_bodegas.py, opcional), cada
 // celda trae bod_k1, las bodegas de su área de captación con la ecuación 1
 // calibrada, y meta.campo.h, el valor de h equivalente; el control "Habitantes
 // por bodega" arranca en ese valor y escala bod_k1 al moverlo.

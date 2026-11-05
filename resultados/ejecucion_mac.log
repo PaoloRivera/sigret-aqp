@@ -138,7 +138,7 @@ JLBR                                  0                                   1
 YURA                                  1                                   1
 TIABAYA                               2                                   0
 UCHUMAYO                              2                                   0
-== 4/14 Integridad (Tabla 6)
+== 4/14 Integridad (Tabla 7)
                                                            Verificacion                                                                              Condicion de cumplimiento                                                                          Valor observado Se cumple
                    Conservacion de la poblacion en la ponderacion areal                                        Diferencia entre poblacion censal y poblacion repartida < 0.5 %                                                         1,018,031 vs 1,018,031 (0.000 %)        Si
                                      Cobertura de manzanas por la malla                                                      Ninguna manzana censal queda fuera de la malla H3                                                            0 manzanas sin celda asignada        Si
@@ -154,7 +154,7 @@ Conservacion del crecimiento censal en la actualizacion de la poblacion El repar
                                Fecha de la poblacion en los predictores                           El ranking usa la poblacion 2025 y el backtesting la poblacion al 31-12-2024                             diferencia maxima: 0.0e+00 hab. (2025) y 0.0e+00 hab. (2024)        Si
 
 >> tabla6_integridad.csv generada
-== 5/14 Sensibilidad (Tabla 15, Figura 25)
+== 5/14 Sensibilidad (Tabla 16, Figura 25)
 parametro      Penalización hard discount  Peso del perfil de sitio  Radio de amenaza  Umbral de población
 variacion_pct                                                                                             
 -20                                   0.9                       1.0               0.4                  1.0
@@ -306,7 +306,7 @@ modelo  ROC_AUC  IC95_inf  IC95_sup  IC_supera_0.85
     RF    0.932     0.897     0.965            True
    XGB    0.921     0.881     0.965            True
    ENS    0.917     0.869     0.969            True
-== 11/14 Simulador (Tabla 5, Tabla 12, Anexo J)
+== 11/14 Simulador con h = 120 (Tablas 6 y 13, Anexo J)
 === Celda representativa (Jacobo Hunter, puesto 4 del Top-10, score 0.972, h3 89b3354888bffff) ===
                1265
 P         8000.2011

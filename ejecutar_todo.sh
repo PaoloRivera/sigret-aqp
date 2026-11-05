@@ -21,12 +21,12 @@ echo "== 8/14 Figuras del Capitulo V";               "$PY" figuras_capitulo5.py
 echo "== 9/14 Analisis complementarios";             "$PY" analisis_complementarios.py
 echo "== 10/14 IC de la validacion espacial";        "$PY" ic_validacion_espacial.py
 echo "== 11/14 Simulador con h = 120 (Tablas 6 y 13, Anexo J)"; "$PY" verificar_huff.py
-# Conteo de campo (Anexo K), solo si ya existe. La muestra no se vuelve a sortear.
+# Conteo de campo opcional, solo si ya existe. La muestra no se vuelve a sortear.
 if [ -f data/campo/kobo/conteo_bodegas.xlsx ]; then
-  echo "== 11b Conteo de campo (Anexo K)"
+  echo "== 11b Conteo de campo"
   "$PY" scripts/15_calibrar_bodegas.py --kobo data/campo/kobo/conteo_bodegas.xlsx
 elif [ -f resultados/campo/conteo_por_celda.csv ]; then
-  echo "== 11b Conteo de campo (Anexo K), desde los conteos publicados"
+  echo "== 11b Conteo de campo, desde los conteos publicados"
   "$PY" scripts/15_calibrar_bodegas.py --conteos resultados/campo/conteo_por_celda.csv
 fi
 echo "== 12/14 Datos de la aplicacion web";          "$PY" scripts/10_generar_json_app.py
