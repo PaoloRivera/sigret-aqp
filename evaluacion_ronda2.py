@@ -8,8 +8,9 @@ propietarios de minimarket, sobre el modo comerciante (observacion 5).
 Entrada, una de dos:
   --kobo data/encuestas/kobo/ronda2.xlsx
         exportacion de KoboToolbox (Data > Downloads > XLS, "XML values and
-        headers"). Esa carpeta no se publica: tiene las respuestas abiertas y la
-        hora de cada envio. El script escribe la version publicable,
+        headers"; tambien lee la de "Labels" y la pasa a nombres con el
+        formulario). Esa carpeta no se publica: tiene las respuestas abiertas y
+        la hora de cada envio. El script escribe la version publicable,
         data/encuestas/ronda2_respuestas.csv, sin texto libre ni horas.
   --respuestas data/encuestas/ronda2_respuestas.csv
         la version publicable, para reproducir el analisis.
@@ -70,7 +71,7 @@ os.makedirs(args.salida, exist_ok=True)
 
 
 def coma(x, d=2):
-    return f"{x:.{d}f}".replace(".", ",")
+    return f"{x:.{d}f}".replace(".", ",").replace("-", "\u2212")
 
 
 def pval(p):
@@ -78,9 +79,30 @@ def pval(p):
 
 
 # ─────────────────────────── lectura ───────────────────────────
+FORMULARIO = "data/encuestas/formulario_ronda2.xlsx"
+
+
+def desde_etiquetas(K):
+    """Exportacion con etiquetas ("Labels"): pasa encabezados y respuestas a los
+    nombres del formulario (consentimiento, rol, s1... y si, dueno_minimarket, 1-5)."""
+    S = pd.read_excel(FORMULARIO, sheet_name="survey", dtype=str)
+    C = pd.read_excel(FORMULARIO, sheet_name="choices", dtype=str)
+    S = S[S["label"].notna()]
+    K = K.rename(columns={str(l).strip(): n for l, n in zip(S["label"], S["name"])})
+    for t, q in zip(S["type"], S["name"]):
+        if t.startswith("select_one ") and q in K.columns:
+            L = C[C["list_name"] == t.split()[1]]
+            m = {str(e).strip(): v for e, v in zip(L["label"], L["name"])}
+            K[q] = K[q].map(lambda x: m.get(str(x).strip(), x) if pd.notna(x) else x)
+    return K
+
+
 if args.kobo:
     K = pd.read_excel(args.kobo)
     K.columns = [str(c).split("/")[-1] for c in K.columns]   # quita prefijos de grupo, si los hubiera
+    if "consentimiento" not in K.columns:
+        K = desde_etiquetas(K)
+        print("Exportacion con etiquetas: se paso a nombres y valores del formulario")
     K = K[K["consentimiento"].astype(str) == "si"].copy()
     K = K[K["rol"].astype(str) != "otro"]
     K = K.dropna(subset=ITEMS)
@@ -252,6 +274,25 @@ elif cumple75 == "cumplido solo en el valor puntual":
 else:
     txt_sus += (f"No alcanza el criterio de 75 (Wilcoxon, {pval(s75['Wilcoxon_p_unilateral'])}): el criterio de "
                 "usabilidad no se cumple para el usuario objetivo.")
+# Advertencias que van en el mismo parrafo: sensibilidad, consistencia interna y tamano de muestra
+S = PR[(PR["muestra"] == "sin_conocimiento_previo") & (PR["variable"] == "SUS") & (PR["criterio"] == 75)]
+if len(S) and int(S.iloc[0]["n"]) < n:
+    r = S.iloc[0]
+    sig = "sigue siendo significativa" if r["Wilcoxon_p_unilateral"] < 0.05 else "deja de ser significativa"
+    txt_sus += (f" Sin los {n - int(r['n'])} que ya conocían el proyecto (n = {int(r['n'])}), el SUS fue de "
+                f"{coma(r['media'])} y la diferencia frente a 75 {sig} (Wilcoxon, {pval(r['Wilcoxon_p_unilateral'])}).")
+elif len(S):
+    txt_sus += " Ninguno de ellos conocía el proyecto antes de la encuesta."
+if s68["alfa_Cronbach"] < 0.70:
+    txt_sus += (f" La consistencia interna del SUS en esta muestra fue baja (alfa = {coma(s68['alfa_Cronbach'])}), "
+                "por lo que el puntaje global debe leerse con cautela.")
+if n < N_MINIMO:
+    txt_sus += (f" Con {n} propietarios, por debajo del mínimo planificado de {N_MINIMO}, estos resultados se "
+                "informan como preliminares.")
+# Efecto techo: porcentaje de respuestas en el valor mas favorable (5 con los items negativos invertidos)
+techo = float((it == 5).to_numpy().mean() * 100)
+L.insert(L.index("## Sensibilidad"), f"Respuestas en el valor más favorable (efecto techo): {coma(techo, 1)} %.")
+L.insert(L.index("## Sensibilidad"), "")
 txt_tam = "En el TAM, "
 partes = []
 for v, nom in dims.items():
@@ -262,6 +303,17 @@ txt_tam += "; ".join(partes) + ". "
 peor = IT.iloc[0]
 txt_tam += (f"El ítem con la media más baja fue {peor['etiqueta']} ({coma(peor['media_orientada'])} de 5, "
             "con la escala de los ítems negativos invertida).")
+bajas = [v for v in dims if P.loc[(v, 4.0)]["alfa_Cronbach"] < 0.70]
+if bajas:
+    nombres = [dims[v] for v in bajas]
+    y = " e " if nombres[-1].startswith("i") else " y "   # «facilidad e intención»
+    lista = nombres[0] if len(nombres) == 1 else ", ".join(nombres[:-1]) + y + nombres[-1]
+    txt_tam += (f" La consistencia interna fue baja en {lista} (alfa menor que 0,70), por lo que "
+                f"{'esa media debe' if len(nombres) == 1 else 'esas medias deben'} leerse con cautela.")
+if techo > 50:
+    txt_tam += (f" El {coma(techo, 0)} % de todas las respuestas, SUS y TAM, quedó en el valor más favorable de la "
+                "escala: ese efecto techo reduce la variación entre ítems y es una de las razones de la baja "
+                "consistencia interna.")
 L += ["", "## Párrafos para la tesis", "", txt_sus, "", txt_tam, ""]
 with open(os.path.join(args.salida, "RESUMEN_RONDA2.md"), "w", encoding="utf-8") as fh:
     fh.write("\n".join(L) + "\n")

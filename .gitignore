@@ -61,3 +61,5 @@ data/campo/kobo/
 # Exportacion de la segunda ronda de evaluacion: trae respuestas abiertas y la
 # hora de cada envio. Se publica data/encuestas/ronda2_respuestas.csv.
 data/encuestas/kobo/
+plantilla_observaciones.xlsx
+resultados/RESUMEN_OBSERVACIONES.md

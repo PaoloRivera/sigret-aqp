@@ -24,7 +24,7 @@ Procedencia, licencia y volumen de cada fuente empleada por el pipeline.
 | `campo/plan_jornadas.csv`, `campo/precision_esperada.csv` | Orden sugerido de visita y precisión esperada de h con esta muestra | `scripts/14_muestra_campo.py` | — |
 | `campo/formulario_kobo.xlsx` | Formulario XLSForm del conteo para KoboToolbox | `scripts/14_muestra_campo.py` | — |
 | `encuestas/formulario_ronda2.xlsx` | Formulario XLSForm de la segunda ronda de evaluación (SUS y TAM por pregunta, anónimo) | `scripts/16_formulario_ronda2.py` | — |
-| `encuestas/ronda2_respuestas.csv` | Respuestas de la segunda ronda, sin texto libre ni horas (cuando exista) | `evaluacion_ronda2.py --kobo` | — |
+| `encuestas/ronda2_respuestas.csv` | Respuestas de la segunda ronda (20 dueños de minimarket), sin texto libre ni horas | `evaluacion_ronda2.py --kobo` | — |
 
 > **Atribución obligatoria.** Los archivos de la carpeta `osm/` derivan de OpenStreetMap y deben acreditarse como *© colaboradores de OpenStreetMap*, conforme exige la Open Database License.
 
@@ -49,6 +49,11 @@ publica porque trae las respuestas abiertas y la hora de cada envío.
 `evaluacion_ronda2.py --kobo` escribe `encuestas/ronda2_respuestas.csv`, que sí
 se publica y basta para reproducir el análisis. El procedimiento está en
 `docs/evaluacion/protocolo_ronda2.md`.
+
+KoboToolbox registró 89 envíos. Según los autores, los 69 primeros fueron
+demostraciones del formulario hechas por el equipo antes de aplicarlo y se
+quitaron de la exportación antes del análisis; `ronda2.xlsx` trae los envíos 70
+a 89.
 
 ### Exportación del conteo de campo
 
